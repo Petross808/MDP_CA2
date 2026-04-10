@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{bffc7649-b77f-42d1-906b-1419411d112a}</ProjectGuid>
+    <RootNamespace>GD425SFML</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)/SFML-3.0.1/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)/SFML-3.0.1/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d /s /i "$(ProjectDir)\SFML-3.0.1\bin\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)/SFML-3.0.1/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)/SFML-3.0.1/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-system.lib;sfml-window.lib;sfml-graphics.lib;sfml-audio.lib;sfml-network.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d /s /i "$(ProjectDir)\SFML-3.0.1\bin\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="action.cpp" />
+    <ClCompile Include="application.cpp" />
+    <ClCompile Include="ball.cpp" />
+    <ClCompile Include="box_collider.cpp" />
+    <ClCompile Include="button.cpp" />
+    <ClCompile Include="circle_collider.cpp" />
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="command_queue.cpp" />
+    <ClCompile Include="component.cpp" />
+    <ClCompile Include="container.cpp" />
+    <ClCompile Include="e_collision_layer.hpp" />
+    <ClCompile Include="game_over_state.cpp" />
+    <ClCompile Include="game_state.cpp" />
+    <ClCompile Include="goal.cpp" />
+    <ClCompile Include="label.cpp" />
+    <ClCompile Include="level.cpp" />
+    <ClCompile Include="level_select_state.cpp" />
+    <ClCompile Include="lobby_state.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="menu_state.cpp" />
+    <ClCompile Include="music_player.cpp" />
+    <ClCompile Include="e_network_mode.hpp" />
+    <ClCompile Include="paddle.cpp" />
+    <ClCompile Include="pause_state.cpp" />
+    <ClCompile Include="pawn.cpp" />
+    <ClCompile Include="physics.cpp" />
+    <ClCompile Include="collider.cpp" />
+    <ClCompile Include="physics_body.cpp" />
+    <ClCompile Include="pickup.cpp" />
+    <ClCompile Include="pickup_spawner.cpp" />
+    <ClCompile Include="player_barrier.cpp" />
+    <ClCompile Include="player_controller.cpp" />
+    <ClCompile Include="polygon_collider.cpp" />
+    <ClCompile Include="score.cpp" />
+    <ClCompile Include="game_data.cpp" />
+    <ClCompile Include="shape_node.cpp" />
+    <ClCompile Include="scene_node.cpp" />
+    <ClCompile Include="settings_state.cpp" />
+    <ClCompile Include="sound_node.cpp" />
+    <ClCompile Include="sound_player.cpp" />
+    <ClCompile Include="state.cpp" />
+    <ClCompile Include="state_stack.cpp" />
+    <ClCompile Include="text_node.cpp" />
+    <ClCompile Include="title_state.cpp" />
+    <ClCompile Include="utility.cpp" />
+    <ClCompile Include="wall.cpp" />
+    <ClCompile Include="world.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="action.hpp" />
+    <ClInclude Include="application.hpp" />
+    <ClInclude Include="ball.hpp" />
+    <ClInclude Include="box_collider.hpp" />
+    <ClInclude Include="circle_collider.hpp" />
+    <ClInclude Include="e_button_type.hpp" />
+    <ClInclude Include="button.hpp" />
+    <ClInclude Include="command.hpp" />
+    <ClInclude Include="command_queue.hpp" />
+    <ClInclude Include="component.hpp" />
+    <ClInclude Include="constants.hpp" />
+    <ClInclude Include="container.hpp" />
+    <ClInclude Include="e_font_id.hpp" />
+    <ClInclude Include="e_pickup_id.hpp" />
+    <ClInclude Include="game_over_state.hpp" />
+    <ClInclude Include="game_state.hpp" />
+    <ClInclude Include="goal.hpp" />
+    <ClInclude Include="label.hpp" />
+    <ClInclude Include="level.hpp" />
+    <ClInclude Include="level_select_state.hpp" />
+    <ClInclude Include="lobby_state.hpp" />
+    <ClInclude Include="menu_state.hpp" />
+    <ClInclude Include="music_player.hpp" />
+    <ClInclude Include="e_music_id.hpp" />
+    <ClInclude Include="paddle.hpp" />
+    <ClInclude Include="pause_state.hpp" />
+    <ClInclude Include="pawn.hpp" />
+    <ClInclude Include="physics.hpp" />
+    <ClInclude Include="collider.hpp" />
+    <ClInclude Include="physics_body.hpp" />
+    <ClInclude Include="pickup.hpp" />
+    <ClInclude Include="pickup_spawner.hpp" />
+    <ClInclude Include="player_barrier.hpp" />
+    <ClInclude Include="player_controller.hpp" />
+    <ClInclude Include="e_receiver_categories.hpp" />
+    <ClInclude Include="polygon_collider.hpp" />
+    <ClInclude Include="score.hpp" />
+    <ClInclude Include="game_data.hpp" />
+    <ClInclude Include="shape_node.hpp" />
+    <ClInclude Include="resource_holder.hpp" />
+    <ClInclude Include="resource_identifiers.hpp" />
+    <ClInclude Include="scene_node.hpp" />
+    <ClInclude Include="settings_state.hpp" />
+    <ClInclude Include="e_shader_id.hpp" />
+    <ClInclude Include="e_sound_id.hpp" />
+    <ClInclude Include="sound_node.hpp" />
+    <ClInclude Include="sound_player.hpp" />
+    <ClInclude Include="state.hpp" />
+    <ClInclude Include="state_stack.hpp" />
+    <ClInclude Include="e_texture_id.hpp" />
+    <ClInclude Include="text_node.hpp" />
+    <ClInclude Include="title_state.hpp" />
+    <ClInclude Include="utility.hpp" />
+    <ClInclude Include="wall.hpp" />
+    <ClInclude Include="world.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="resource_holder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
