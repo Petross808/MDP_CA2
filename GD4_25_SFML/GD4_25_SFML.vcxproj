@@ -148,7 +148,9 @@
     <ClCompile Include="component.cpp" />
     <ClCompile Include="container.cpp" />
     <ClCompile Include="e_collision_layer.hpp" />
+    <ClCompile Include="game_client.cpp" />
     <ClCompile Include="game_over_state.cpp" />
+    <ClCompile Include="game_server.cpp" />
     <ClCompile Include="game_state.cpp" />
     <ClCompile Include="goal.cpp" />
     <ClCompile Include="label.cpp" />
@@ -198,9 +200,12 @@
     <ClInclude Include="component.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="container.hpp" />
+    <ClInclude Include="e_connection_status.hpp" />
     <ClInclude Include="e_font_id.hpp" />
     <ClInclude Include="e_pickup_id.hpp" />
+    <ClInclude Include="game_client.hpp" />
     <ClInclude Include="game_over_state.hpp" />
+    <ClInclude Include="game_server.hpp" />
     <ClInclude Include="game_state.hpp" />
     <ClInclude Include="goal.hpp" />
     <ClInclude Include="label.hpp" />

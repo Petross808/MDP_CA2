@@ -28,7 +28,7 @@ public:
 	float GetElasticity() const;
 	float GetGrip() const;
 
-	void SetVelocity(int x, int y);
+	void SetVelocity(float x, float y);
 	void ClampVelocity(float upper_limit);
 
 	void SetAsKinematic();

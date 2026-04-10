@@ -26,6 +26,11 @@ namespace gui
 		void SetCallback(Callback callback);
 		void SetText(const std::string& text);
 		void SetToggle(bool flag);
+		void SetVisibility(bool visible);
+
+		void CentreButton();
+
+		std::string GetText() const;
 
 		virtual bool IsSelectable() const override;
 		virtual void Select() override;
@@ -43,6 +48,7 @@ namespace gui
 		sf::Sprite m_sprite;
 		sf::Text m_text;
 		bool m_is_toggle;
+		bool m_is_visible;
 
 		SoundPlayer& m_sounds;
 	};

@@ -96,7 +96,7 @@ float PhysicsBody::GetGrip() const
 	return m_grip;
 }
 
-void PhysicsBody::SetVelocity(int x, int y)
+void PhysicsBody::SetVelocity(float x, float y)
 {
 	m_velocity = sf::Vector2f(x, y);
 }
