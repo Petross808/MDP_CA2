@@ -61,7 +61,7 @@ void Ball::OnCollision(Collider& other, CommandQueue& command_queue)
 	
 	if (m_bounce_limit >= 10)
 	{
-		sf::Vector2f dir(Utility::RandomInt(100) - 50, Utility::RandomInt(100) - 50);
+		sf::Vector2f dir(Utility::RandomInt(100) - 50.f, Utility::RandomInt(100) - 50.f);
 		m_physics_body.ApplyImpulse(10, dir);
 		m_bounce_limit = 0;
 	}
@@ -100,7 +100,7 @@ void Ball::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	if (m_timer <= 0)
 	{
-		sf::Vector2f dir(Utility::RandomInt(100) - 50, Utility::RandomInt(100) - 50);
+		sf::Vector2f dir(Utility::RandomInt(100) - 50.f, Utility::RandomInt(100) - 50.f);
 		
 		if (dir.y == 0)
 		{

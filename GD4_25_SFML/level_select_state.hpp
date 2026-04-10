@@ -17,9 +17,6 @@ public:
 	virtual bool Update(sf::Time dt) override;
 	virtual bool HandleEvent(const sf::Event& event) override;
 
-	void CycleLevel();
-	void CycleCharacter(int player_id);
-
 private:
 	sf::Sprite m_background_sprite;
 	gui::Container m_gui_container;

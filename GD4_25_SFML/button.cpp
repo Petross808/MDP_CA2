@@ -15,6 +15,7 @@ gui::Button::Button(StateStack::Context context)
     , m_text(context.fonts->Get(FontID::kMain), "", 16)
     , m_is_toggle(false)
     , m_sounds(*context.sound)
+	, m_is_visible(true)
 {
     ChangeTexture(ButtonType::kNormal);
     sf::FloatRect bounds = m_sprite.getLocalBounds();
@@ -31,6 +32,23 @@ void gui::Button::SetToggle(bool flag)
     m_is_toggle = flag;
 }
 
+void gui::Button::SetVisibility(bool visible)
+{
+    m_is_visible = visible;
+}
+
+void gui::Button::CentreButton()
+{
+	Utility::CentreOrigin(m_sprite);
+    sf::FloatRect bounds = m_sprite.getLocalBounds();
+    m_text.setPosition(sf::Vector2f(0,0));
+}
+
+std::string gui::Button::GetText() const
+{
+    return m_text.getString();
+}
+
 void gui::Button::SetText(const std::string& text)
 {
     m_text.setString(text);
@@ -39,7 +57,7 @@ void gui::Button::SetText(const std::string& text)
 
 bool gui::Button::IsSelectable() const
 {
-    return true;
+    return m_is_visible;
 }
 
 void gui::Button::Select()
@@ -94,6 +112,9 @@ void gui::Button::HandleEvent(const sf::Event& event)
 
 void gui::Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    if (!m_is_visible)
+        return;
+
     states.transform *= getTransform();
     target.draw(m_sprite, states);
     target.draw(m_text, states);

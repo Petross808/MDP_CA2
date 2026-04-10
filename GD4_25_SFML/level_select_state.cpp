@@ -28,7 +28,7 @@ LevelSelectState::LevelSelectState(StateStack& stack) :
 	level->SetText("Level");
 	level->SetCallback([this, levelLabel, data]()
 		{
-			CycleLevel();
+			data->CycleLevel();
 			levelLabel->SetText(data->GetLevelName());
 		});
 
@@ -46,7 +46,7 @@ LevelSelectState::LevelSelectState(StateStack& stack) :
 		player_one->SetText("Player " + std::to_string(i + 1));
 		player_one->SetCallback([this, playerLabel, data, i]()
 			{
-				CycleCharacter(i);
+				data->CycleCharacter(i);
 				playerLabel->SetText(data->GetCharacterName(i));
 			});
 		m_gui_container.Pack(player_one);
@@ -88,18 +88,4 @@ bool LevelSelectState::HandleEvent(const sf::Event& event)
 {
 	m_gui_container.HandleEvent(event);
 	return false;
-}
-
-void LevelSelectState::CycleLevel()
-{
-	auto context = GetContext();
-	int level = (context.game_data->GetSelectedLevel() + 1) % kLevelCount;
-	context.game_data->SetSelectedLevel(level);
-}
-
-void LevelSelectState::CycleCharacter(int player_id)
-{
-	auto context = GetContext();
-	int character = (context.game_data->GetSelectedCharacter(player_id) + 1) % kCharacterCount;
-	context.game_data->SetSelectedCharacter(player_id, character);
 }
