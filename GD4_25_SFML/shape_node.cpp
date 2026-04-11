@@ -54,8 +54,14 @@ ShapeNode::~ShapeNode() = default;
 
 void ShapeNode::SetColor(sf::Color color)
 {
-	m_shape->setOutlineColor(color);
 	m_shape->setFillColor(color);
+}
+
+//Jakub Polacek - GD4b - D00260171
+void ShapeNode::SetOutlineColor(sf::Color color, float thickness)
+{
+	m_shape->setOutlineThickness(thickness);
+	m_shape->setOutlineColor(color);
 }
 
 //Jakub Polacek - GD4b - D00260171
