@@ -25,6 +25,7 @@ SoundPlayer::SoundPlayer()
 {
 	m_sound_buffers.Load(SoundID::kButton, "Media/Sound/button_click.wav");
 	m_sound_buffers.Load(SoundID::kBounce, "Media/Sound/ball_bounce.wav");
+	m_sound_buffers.Load(SoundID::kPickupSpawn, "Media/Sound/powerup_spawn.wav");
 	m_sound_buffers.Load(SoundID::kPickupCollect, "Media/Sound/powerup_pickup.wav");
 	m_sound_buffers.Load(SoundID::kPickupUse, "Media/Sound/powerup_use.wav");
 

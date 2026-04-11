@@ -57,7 +57,7 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, TextureHolder& text
 	dynamic->AttachChild(std::move(paddle_two));
 
 
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, &texture_holder, 10));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, sounds, &texture_holder, 2));
 	dynamic->AttachChild(std::move(pickupSpawner));
 
 
@@ -123,7 +123,7 @@ void Level::CreateDiamond(SceneNode& root, Physics& physics, TextureHolder& text
 	dynamic->AttachChild(std::move(paddle_two));
 
 
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, &texture_holder, 10));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, sounds, &texture_holder, 15));
 	dynamic->AttachChild(std::move(pickupSpawner));
 
 

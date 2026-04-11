@@ -112,16 +112,16 @@ void Paddle::SetPickup(PickupID pickup_id)
 	case PickupID::kNone:
 		break;
 	case PickupID::kSpeedBoost:
-		m_shape->SetColor(sf::Color::Color(173,216,230));
+		m_shape->SetOutlineColor(sf::Color::Color(173,216,230));
 		break;
 	case PickupID::kXFlip:
-		m_shape->SetColor(sf::Color::Yellow);
+		m_shape->SetOutlineColor(sf::Color::Yellow);
 		break;
 	case PickupID::kYFlip:
-		m_shape->SetColor(sf::Color::Red);
+		m_shape->SetOutlineColor(sf::Color::Red);
 		break;
 	case PickupID::kSlow:
-		m_shape->SetColor(sf::Color::Magenta);
+		m_shape->SetOutlineColor(sf::Color::Magenta);
 		break;
 	default:
 		break;
@@ -162,7 +162,7 @@ void Paddle::UsePickup()
 	m_pickup_id = PickupID::kNone;
 	if (m_shape != nullptr)
 	{
-		m_shape->SetColor(sf::Color::White);
+		m_shape->SetOutlineColor(sf::Color::White, 0.f);
 	}
 }
 

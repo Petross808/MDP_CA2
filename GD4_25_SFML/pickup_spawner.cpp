@@ -7,10 +7,11 @@
 #include "pickup.hpp"
 #include "utility.hpp"
 
-PickupSpawner::PickupSpawner(float x, float y, int width, int height, Physics* physics_ptr, TextureHolder* texture_holder, float spawn_time) :
+PickupSpawner::PickupSpawner(float x, float y, int width, int height, Physics* physics_ptr, SoundPlayer& sounds, TextureHolder* texture_holder, float spawn_time) :
 	m_width(width),
 	m_height(height),
 	m_physics_ptr(physics_ptr),
+	m_sounds(sounds),
 	m_texture_holder(texture_holder),
 	m_spawn_time(spawn_time),
 	m_cooldown(spawn_time)
@@ -33,6 +34,7 @@ void PickupSpawner::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		float x = static_cast<float>(Utility::RandomInt(m_width));
 		float y = static_cast<float>(Utility::RandomInt(m_height));
 		sf::Texture* water = &m_texture_holder->Get(TextureID::kWater);
+		m_sounds.Play(SoundID::kPickupSpawn);
 
 		int id = Utility::RandomInt(1, static_cast<int>(PickupID::kPickupCount));
 		std::unique_ptr<Pickup> pickupTest(new Pickup(x, y, 30, m_physics_ptr, static_cast<PickupID>(id), water));
