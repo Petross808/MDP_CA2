@@ -82,7 +82,7 @@ std::string GameData::GetLevelName() const
 	case 0:
 		return "Classic";
 	case 1:
-		return "Diamonds";
+		return "Perilous";
 	default:
 		return "Other";
 	}
@@ -95,9 +95,9 @@ std::string GameData::GetCharacterName(int player_id)
 	case 0:
 		return "Classic";
 	case 1:
-		return "Hex";
+		return "Hexagon";
 	case 2:
-		return "Diamond";
+		return "Rhombus";
 	case 3:
 		return "Pro";
 	default:

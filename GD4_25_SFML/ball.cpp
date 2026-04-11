@@ -16,7 +16,7 @@ Ball::Ball(float x, float y, float radius, Physics* physics, sf::Texture* textur
 	SceneNode(ReceiverCategories::kBall),
 	m_physics_body(this, physics, 1, 1000, 0, 1.1f),
 	m_bounce_sound(DerivedAction<SoundNode>([this](SoundNode& s, sf::Time dt) { s.PlaySound(SoundID::kBounce, GetWorldPosition(), 1 + Utility::RandomInt(-5,6) * 0.005f);}), ReceiverCategories::kSoundNode),
-	m_start_delay(2),
+	m_start_delay(1),
 	m_initial_pos(x, y),
 	m_timer(m_start_delay),
 	m_bounce_limit(),
@@ -59,7 +59,7 @@ void Ball::OnCollision(Collider& other, CommandQueue& command_queue)
 		command_queue.Push(m_bounce_sound);
 	}
 	
-	if (m_bounce_limit >= 10)
+	if (m_bounce_limit >= 6)
 	{
 		sf::Vector2f dir(Utility::RandomInt(100) - 50.f, Utility::RandomInt(100) - 50.f);
 		m_physics_body.ApplyImpulse(10, dir);
@@ -100,16 +100,18 @@ void Ball::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	if (m_timer <= 0)
 	{
-		sf::Vector2f dir(Utility::RandomInt(100) - 50.f, Utility::RandomInt(100) - 50.f);
+		sf::Vector2f dir(static_cast<float>(Utility::RandomInt(-90, 90)), static_cast<float>(Utility::RandomInt(-40, 40)));
 		
-		if (dir.y == 0)
+		if (dir.x >= 0 && dir.x < 40)
 		{
-			dir.y = 5;
+			dir.x = 40;
 		}
-		if (dir.x == 0)
+		if (dir.x > -40 && dir.x < 0)
 		{
-			dir.x = 20;
+			dir.x = -40;
 		}
+
+
 
 		m_physics_body.ApplyImpulse(kInitialBallSpeed, dir);
 	}
