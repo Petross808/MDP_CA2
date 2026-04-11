@@ -111,8 +111,7 @@ LobbyState::LobbyState(StateStack& stack) :
 	m_ready_button->CentreButton();
 	m_ready_button->SetCallback([this]()
 		{
-			m_game_client->m_lobby_ready = !m_game_client->m_lobby_ready;
-			// Send ready packet to server
+			m_game_client->ToggleLobbyReady();
 		});
 	m_gui_container.Pack(m_ready_button);
 
@@ -142,7 +141,7 @@ bool LobbyState::Update(sf::Time dt)
 {
 	m_game_client->Update(dt);
 	
-	if(m_game_client->m_lobby_ready)
+	if(m_game_client->IsLobbyReady())
 	{
 		m_ready_button->SetText("Cancel Ready");
 	}

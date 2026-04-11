@@ -26,14 +26,23 @@ public:
 	ConnectionStatus GetStatus() const;
 
 	void ConnectToServer(std::optional<sf::IpAddress> ipAddress);
+	void DisconnectFromServer();
+	void SendPacket(sf::Packet &packet);
 
-public:
+	void ToggleLobbyReady();
+	bool IsLobbyReady() const;
 
-	bool m_lobby_ready;
+private:
+	void OnConnected();
+	void HandlePacket(uint8_t packet_type, sf::Packet& packet);
 
 private:
 	ConnectionStatus m_status;
 	sf::TcpSocket m_socket;
 	sf::Clock m_connection_timer;
+
+	bool m_lobby_ready;
+	uint8_t m_player_id;
+	uint8_t m_team;
 };
 
