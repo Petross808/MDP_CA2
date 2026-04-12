@@ -11,6 +11,9 @@
 #include <memory>
 
 #include "e_connection_status.hpp"
+#include "player_data.hpp"
+
+class LobbyState;
 
 class GameClient
 {
@@ -21,6 +24,9 @@ public:
 	GameClient();
 	~GameClient();
 
+	void Start(LobbyState* lobby);
+	void End();
+
 	void Update(sf::Time dt);
 
 	ConnectionStatus GetStatus() const;
@@ -30,19 +36,24 @@ public:
 	void SendPacket(sf::Packet &packet);
 
 	void ToggleLobbyReady();
-	bool IsLobbyReady() const;
+
+	PlayerData& GetLocalPlayer();
+	PlayerData& GetPlayer(uint8_t playerId);
+
+	void UpdatePlayerOnRemote();
+	void ChangeLevelOnRemote(uint8_t levelId);
 
 private:
-	void OnConnected();
 	void HandlePacket(uint8_t packet_type, sf::Packet& packet);
 
 private:
+	bool m_client_running;
 	ConnectionStatus m_status;
 	sf::TcpSocket m_socket;
 	sf::Clock m_connection_timer;
 
-	bool m_lobby_ready;
-	uint8_t m_player_id;
-	uint8_t m_team;
-};
+	PlayerData m_local_player;
+	std::vector<PlayerData> m_player_list;
 
+	LobbyState* m_lobby;
+};

@@ -9,7 +9,8 @@ namespace ClientProtocol
 		kEmpty,
 		kIntroduceSelf,
 		kLeaveGame,
-		kLobbyReady,
+		kLobbyUpdateSelf,
+		kChangeLevel
 	};
 
 	struct Empty
@@ -34,19 +35,32 @@ namespace ClientProtocol
 
 	struct LeaveGame
 	{
+	public:
 		LeaveGame();
 		LeaveGame(sf::Packet& packet);
 		sf::Packet asPacket() const;
 	};
 
-	struct LobbyReady
+	struct LobbyUpdateSelf
 	{
 	public:
-		LobbyReady(bool isReady);
-		LobbyReady(sf::Packet& packet);
+		LobbyUpdateSelf(bool isReady, uint8_t characterId, std::string name);
+		LobbyUpdateSelf(sf::Packet& packet);
 		sf::Packet asPacket() const;
 	public:
 		bool isReady;
+		uint8_t characterId;
+		std::string name;
 	};
-};
+
+	struct ChangeLevel
+	{
+	public:
+		ChangeLevel(uint8_t levelId);
+		ChangeLevel(sf::Packet& packet);
+		sf::Packet asPacket() const;
+	public:
+		uint8_t levelId;
+	};
+}
 

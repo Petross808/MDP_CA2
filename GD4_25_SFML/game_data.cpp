@@ -105,6 +105,11 @@ std::string GameData::GetCharacterName(int player_id)
 	}
 }
 
+void GameData::SetLevel(int level)
+{
+	m_selected_level = level % kLevelCount;
+}
+
 void GameData::CycleLevel()
 {
 	m_selected_level = (m_selected_level + 1) % kLevelCount;

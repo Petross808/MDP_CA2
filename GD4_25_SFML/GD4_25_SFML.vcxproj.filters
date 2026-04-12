@@ -171,6 +171,9 @@
     <ClCompile Include="server_protocol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="player_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utility.hpp">
@@ -351,6 +354,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="server_protocol.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player_data.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

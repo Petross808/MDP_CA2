@@ -46,19 +46,42 @@ sf::Packet ClientProtocol::LeaveGame::asPacket() const
 }
 
 
-// --- Lobby Ready Packet ---
-ClientProtocol::LobbyReady::LobbyReady(bool isReady) : isReady(isReady) {}
-ClientProtocol::LobbyReady::LobbyReady(sf::Packet& packet)
+// --- Lobby Update Self Packet ---
+ClientProtocol::LobbyUpdateSelf::LobbyUpdateSelf(bool isReady, uint8_t characterId, std::string name) :
+	isReady(isReady), characterId(characterId), name(name) {}
+ClientProtocol::LobbyUpdateSelf::LobbyUpdateSelf(sf::Packet& packet)
 {
 	uint8_t ready;
+	char name[20];
 	packet >> ready;
+	packet >> this->characterId;
+	packet >> name;
+	this->name = std::string(name);
 	isReady = ready != 0;
 }
 
-sf::Packet ClientProtocol::LobbyReady::asPacket() const
+sf::Packet ClientProtocol::LobbyUpdateSelf::asPacket() const
 {
 	sf::Packet packet;
-	packet << static_cast<uint8_t>(PacketType::kLobbyReady);
+	packet << static_cast<uint8_t>(PacketType::kLobbyUpdateSelf);
 	packet << static_cast<uint8_t>(isReady);
+	packet << characterId;
+	packet << name.substr(0, 20);
+	return packet;
+}
+
+
+// --- Change Level Packet ---
+ClientProtocol::ChangeLevel::ChangeLevel(uint8_t levelId) : levelId(levelId) {}
+ClientProtocol::ChangeLevel::ChangeLevel(sf::Packet& packet)
+{
+	packet >> this->levelId;
+}
+
+sf::Packet ClientProtocol::ChangeLevel::asPacket() const
+{
+	sf::Packet packet;
+	packet << static_cast<uint8_t>(PacketType::kChangeLevel);
+	packet << this->levelId;
 	return packet;
 }

@@ -30,6 +30,9 @@ public:
 	explicit GameServer();
 	~GameServer();
 
+	void Start();
+	void End();
+
 private:
 	struct RemotePeer
 	{
@@ -39,11 +42,7 @@ private:
 		bool m_ready;
 		bool m_timed_out;
 
-		uint8_t m_assigned_id;
-		uint8_t m_assigned_team;
-		uint8_t m_character_id;
-		std::string m_name;
-		bool m_lobby_ready;
+		PlayerData m_player_data;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
@@ -66,10 +65,12 @@ private:
 private:
 	uint8_t GetFreeID() const;
 	uint8_t GetFreeTeam() const;
+	void ReadyCheck();
 
 
 private:
-	std::thread m_thread;
+	bool m_server_running;
+	std::unique_ptr<std::thread> m_thread;
 	sf::Clock m_clock;
 	sf::TcpListener m_listener_socket;
 	bool m_listening_state;
@@ -80,5 +81,8 @@ private:
 
 	std::vector<PeerPtr> m_peers;
 	bool m_waiting_thread_end;
+
+	uint8_t m_current_level;
+	bool m_in_game;
 };
 

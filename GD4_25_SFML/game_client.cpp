@@ -8,12 +8,16 @@
 #include "game_client.hpp"
 #include "game_server.hpp"
 #include "client_protocol.hpp"
+#include "lobby_state.hpp"
 
 #include <iostream>
 
-GameClient::GameClient() : m_status(ConnectionStatus::kNone), m_player_id(0), m_team(0)
+GameClient::GameClient() :
+	m_status(ConnectionStatus::kNone), m_client_running(false),
+	m_local_player(),
+	m_player_list(0),
+	m_lobby(nullptr)
 {
-	m_lobby_ready = false;
 	m_socket.setBlocking(false);
 }
 
@@ -22,8 +26,24 @@ GameClient::~GameClient()
 	DisconnectFromServer();
 }
 
+void GameClient::Start(LobbyState* lobby)
+{
+	m_lobby = lobby;
+	m_client_running = true;
+	m_local_player.lobby_ready = false;
+}
+
+void GameClient::End()
+{
+	m_lobby = nullptr;
+	m_client_running = false;
+	DisconnectFromServer();
+}
+
 void GameClient::Update(sf::Time dt)
 {
+	if (!m_client_running) return;
+
 	if(m_status == ConnectionStatus::kInProgress)
 	{
 		sf::Packet packet;
@@ -32,7 +52,6 @@ void GameClient::Update(sf::Time dt)
 		{
 			m_status = ConnectionStatus::kConnected;
 			m_connection_timer.stop();
-			OnConnected();
 		}
 
 		if(m_connection_timer.getElapsedTime().asSeconds() > 5.f)
@@ -50,6 +69,11 @@ void GameClient::Update(sf::Time dt)
 		if (status == sf::Socket::Status::Disconnected)
 		{
 			m_status = ConnectionStatus::kTimeOut;
+			m_player_list.clear();
+			if (m_lobby)
+			{
+				m_lobby->ClearPlayers();
+			}
 		}
 
 		sf::Packet packet;
@@ -97,19 +121,38 @@ void GameClient::SendPacket(sf::Packet &packet)
 
 void GameClient::ToggleLobbyReady()
 {
-	m_lobby_ready = !m_lobby_ready;
-	sf::Packet packet = ClientProtocol::LobbyReady(m_lobby_ready).asPacket();
+	m_local_player.lobby_ready = !m_local_player.lobby_ready;
+	UpdatePlayerOnRemote();
+}
+
+PlayerData& GameClient::GetLocalPlayer()
+{
+	return m_local_player;
+}
+
+PlayerData& GameClient::GetPlayer(uint8_t playerId)
+{
+	for (auto& player : m_player_list)
+	{
+		if (player.id == playerId)
+		{
+			return player;
+		}
+	}
+	assert(false && "Player ID not found!"); // This should never happen if the server is working correctly
+	return m_local_player; // Fallback to local player
+}
+
+void GameClient::UpdatePlayerOnRemote()
+{
+	sf::Packet packet = ClientProtocol::LobbyUpdateSelf(m_local_player.lobby_ready, m_local_player.character, m_local_player.name).asPacket();
 	SendPacket(packet);
 }
 
-bool GameClient::IsLobbyReady() const
+void GameClient::ChangeLevelOnRemote(uint8_t levelId)
 {
-	return m_lobby_ready;
-}
-
-void GameClient::OnConnected()
-{
-	m_lobby_ready = false;
+	sf::Packet packet = ClientProtocol::ChangeLevel(levelId).asPacket();
+	SendPacket(packet);
 }
 
 void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
@@ -124,13 +167,21 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 		case ServerProtocol::PacketType::kWelcomePlayer:
 		{
 			ServerProtocol::WelcomePlayer welcome(packet);
-			m_player_id = welcome.assignedId;
-			m_team = welcome.assignedTeam;
+			m_local_player.id = welcome.assignedId;
+			m_local_player.team = welcome.assignedTeam;
+			m_player_list = welcome.playerList;
 
 			std::cout << "Welcome! Your id is: " << std::to_string(welcome.assignedId) << std::endl;
 
-			std::string name = "Player";
-			sf::Packet packet = ClientProtocol::IntroduceSelf(0, name).asPacket();
+			if (m_lobby)
+			{
+				for (auto& player : m_player_list)
+				{
+					m_lobby->AddPlayer(player);
+				}
+			}
+
+			sf::Packet packet = ClientProtocol::IntroduceSelf(m_local_player.character, m_local_player.name).asPacket();
 			SendPacket(packet);;
 			break;
 		}
@@ -138,12 +189,40 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 		{
 			ServerProtocol::PlayerJoined player_joined(packet);
 			std::cout << "Player " << player_joined.name << " joined the game!" << std::endl;
+			PlayerData& data = m_player_list.emplace_back(
+				player_joined.playerId,
+				player_joined.name,
+				player_joined.team,
+				player_joined.characterId,
+				false);
+
+			if (m_lobby)
+			{
+				m_lobby->AddPlayer(data);
+			}
 			break;
 		}
 		case ServerProtocol::PacketType::kPlayerLeft:
 		{
 			ServerProtocol::PlayerLeft player_left(packet);
 			std::cout << "Player " << static_cast<int>(player_left.playerId) << " left the game!" << std::endl;
+			if (m_lobby)
+			{
+				m_lobby->RemovePlayer(player_left.playerId);
+			}
+			break;
+		}
+		case ServerProtocol::PacketType::kLobbyPlayerUpdate:
+		{
+			ServerProtocol::LobbyPlayerUpdate lobby_update(packet);
+			PlayerData& player = GetPlayer(lobby_update.playerId);
+			player.lobby_ready = lobby_update.isReady;
+			player.character = lobby_update.characterId;
+			player.name = lobby_update.name;
+			if (m_lobby)
+			{
+				m_lobby->UpdatePlayer(player);
+			}
 			break;
 		}
 	}
