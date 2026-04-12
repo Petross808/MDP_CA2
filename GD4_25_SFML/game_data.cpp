@@ -82,7 +82,9 @@ std::string GameData::GetLevelName() const
 	case 0:
 		return "Classic";
 	case 1:
-		return "Perilous";
+		return "Jagged";
+	case 2:
+		return "Deadly";
 	default:
 		return "Other";
 	}

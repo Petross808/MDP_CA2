@@ -17,6 +17,9 @@ GameOverState::GameOverState(StateStack& stack)
 
     auto context = GetContext();
 
+    context.music->Stop();
+    context.sound->Play(SoundID::kGameOverWin);
+
     if (context.game_data->GetTeamOneScore() > context.game_data->GetTeamTwoScore())
     {
         m_game_over_text.setString("Player 1 wins!");

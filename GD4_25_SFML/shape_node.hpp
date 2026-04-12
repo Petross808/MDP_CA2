@@ -23,7 +23,7 @@ public:
 	~ShapeNode();
 
 	void SetColor(sf::Color color);
-	void SetOutlineColor(sf::Color color, float thickness = -5.f); //Jakub Polacek - GD4b - D00260171
+	void SetOutlineColor(sf::Color color, float thickness = -10.f); //Jakub Polacek - GD4b - D00260171
 	void SetTexture(sf::Texture &texture); //Jakub Polacek - GD4b - D00260171
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
 

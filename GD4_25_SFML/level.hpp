@@ -16,5 +16,6 @@ public:
 	static void CreateBounds(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, float wall_width, sf::Texture* texture);
 
 	static void CreateClassic(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue);
-	static void CreateDiamond(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue);
+	static void CreateJagged(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue);
+	static void CreateDeadly(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue);
 };

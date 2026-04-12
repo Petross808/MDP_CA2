@@ -12,5 +12,7 @@ enum class SoundID
 	kPickupSpawn,
 	kPickupCollect,
 	kPickupUse,
+	kGameOverWin,
+	kGameOverLose,
 	kSoundCount
 };

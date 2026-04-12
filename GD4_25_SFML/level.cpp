@@ -93,7 +93,7 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, TextureHolder& text
 	root.AttachChild(std::move(dynamic));
 }
 
-void Level::CreateDiamond(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue)
+void Level::CreateJagged(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue)
 {
 	sf::Texture* wallGrey = &texture_holder.Get(TextureID::kWallGrey);
 	sf::Texture* wallRed = &texture_holder.Get(TextureID::kWallRed);
@@ -171,6 +171,75 @@ void Level::CreateDiamond(SceneNode& root, Physics& physics, TextureHolder& text
 
 	std::unique_ptr<Wall> obstacle4(new Wall(center.x, world_bounds.size.y, bigDiamondShape, &physics, wallGrey));
 	walls->AttachChild(std::move(obstacle4));
+
+	root.AttachChild(std::move(background));
+	root.AttachChild(std::move(walls));
+	root.AttachChild(std::move(dynamic));
+}
+
+void Level::CreateDeadly(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue)
+{
+	sf::Texture* wallGrey = &texture_holder.Get(TextureID::kWallGrey);
+	sf::Texture* wallRed = &texture_holder.Get(TextureID::kWallRed);
+	sf::Texture* stoneWhite = &texture_holder.Get(TextureID::kStoneWhite);
+	sf::Texture* stoneBlack = &texture_holder.Get(TextureID::kStoneBlack);
+	sf::Texture* tileGrey = &texture_holder.Get(TextureID::kTileGrey);
+	sf::Texture* tileChess = &texture_holder.Get(TextureID::kTileChess);
+	sf::Texture* tileGreen = &texture_holder.Get(TextureID::kTileGreen);
+	sf::Texture* fire = &texture_holder.Get(TextureID::kFire);
+
+	std::unique_ptr<SceneNode> background(new SceneNode());
+	std::unique_ptr<SceneNode> walls(new SceneNode());
+	std::unique_ptr<SceneNode> dynamic(new SceneNode());
+
+	sf::Vector2f center(world_bounds.getCenter());
+
+	CreateBounds(*walls, physics, world_bounds, 10, wallRed);
+	
+	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, fire));
+	dynamic->AttachChild(std::move(ball));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(600, 20, 340, 800, &physics, sounds, &texture_holder, 15));
+	dynamic->AttachChild(std::move(pickupSpawner));
+
+	std::unique_ptr<Paddle> paddle_one(new Paddle(0, data.GetSelectedCharacter(0), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(paddle_one));
+	std::unique_ptr<Paddle> paddle_two(new Paddle(1, data.GetSelectedCharacter(1), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(paddle_two));
+
+
+	std::unique_ptr<ShapeNode> team_one_zone(new ShapeNode(600, world_bounds.size.y));
+	team_one_zone->setPosition({ 0,0 });
+	team_one_zone->SetTexture(*tileGrey);
+	background->AttachChild(std::move(team_one_zone));
+	std::unique_ptr<ShapeNode> team_two_zone(new ShapeNode(600, world_bounds.size.y));
+	team_two_zone->setPosition({ 1000, 0 });
+	team_two_zone->SetTexture(*tileGrey);
+	background->AttachChild(std::move(team_two_zone));
+
+	std::unique_ptr<ShapeNode> playing_field(new ShapeNode(400, world_bounds.size.y));
+	playing_field->setPosition({ 600, 0 });
+	playing_field->SetTexture(*tileGreen);
+	background->AttachChild(std::move(playing_field));
+
+
+	std::unique_ptr<PlayerBarrier> team_one_barrier(new PlayerBarrier(600, 0, 50, world_bounds.size.y, &physics));
+	background->AttachChild(std::move(team_one_barrier));
+	std::unique_ptr<PlayerBarrier> team_two_barrier(new PlayerBarrier(world_bounds.size.x - 650, 0, 50, world_bounds.size.y, &physics));
+	background->AttachChild(std::move(team_two_barrier));
+
+	std::unique_ptr<Goal> team_one_goal_middle(new Goal(0, 0, 0, 30, world_bounds.size.y, &physics, tileChess));
+	std::unique_ptr<Goal> team_one_goal_top(new Goal(0, 30, 0, center.x - 230, 30, &physics, tileChess));
+	std::unique_ptr<Goal> team_one_goal_bottom(new Goal(0, 30, world_bounds.size.y - 30, center.x - 230, 30, &physics, tileChess));
+	background->AttachChild(std::move(team_one_goal_top));
+	background->AttachChild(std::move(team_one_goal_middle));
+	background->AttachChild(std::move(team_one_goal_bottom));
+
+	std::unique_ptr<Goal> team_two_goal(new Goal(1, world_bounds.size.x - 30, 0, 30, world_bounds.size.y, &physics, tileChess));
+	std::unique_ptr<Goal> team_two_goal_top(new Goal(1, center.x + 200, 0, center.x - 230, 30, &physics, tileChess));
+	std::unique_ptr<Goal> team_two_goal_bottom(new Goal(1, center.x + 200, world_bounds.size.y - 30, center.x - 230, 30, &physics, tileChess));
+	background->AttachChild(std::move(team_two_goal));
+	background->AttachChild(std::move(team_two_goal_top));
+	background->AttachChild(std::move(team_two_goal_bottom));
 
 	root.AttachChild(std::move(background));
 	root.AttachChild(std::move(walls));
