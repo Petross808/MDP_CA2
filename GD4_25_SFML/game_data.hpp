@@ -31,6 +31,8 @@ public:
 	std::string GetLevelName() const;
 	std::string GetCharacterName(int player_id);
 
+	void SetLevel(int level);
+
 	void Reset();
 
 private:

@@ -17,6 +17,8 @@
 #include "music_player.hpp"
 #include "sound_player.hpp"
 #include "game_data.hpp"
+#include "game_client.hpp"
+#include "game_server.hpp"
 
 class State;
 
@@ -26,7 +28,8 @@ public:
 	struct Context
 	{
 		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, ShaderHolder& shaders,
-			PlayerController::Array& players, MusicPlayer& music, SoundPlayer& sound, GameData & data);
+			PlayerController::Array& players, MusicPlayer& music, SoundPlayer& sound, GameData & data,
+			GameClient& client, GameServer& server);
 		~Context();
 
 		sf::RenderWindow* window;
@@ -37,6 +40,8 @@ public:
 		MusicPlayer* music;
 		SoundPlayer* sound;
 		GameData* game_data;
+		GameClient* client;
+		GameServer* server;
 	};
 
 public:
@@ -65,9 +70,9 @@ private:
 	};
 
 private:
+	Context m_context;
 	std::list<std::unique_ptr<State>> m_stack;
 	std::list<PendingChange> m_pending_list;
-	Context m_context;
 };
 
 template<typename T>

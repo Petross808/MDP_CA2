@@ -15,6 +15,8 @@
 #include "music_player.hpp"
 #include "sound_player.hpp"
 #include "game_data.hpp"
+#include "game_client.hpp"
+#include "game_server.hpp"
 
 class Application
 {
@@ -40,6 +42,9 @@ private:
 
 	MusicPlayer m_music;
 	SoundPlayer m_sound;
+
+	GameClient m_game_client;
+	GameServer m_game_server;
 
 	StateStack m_stack;
 };

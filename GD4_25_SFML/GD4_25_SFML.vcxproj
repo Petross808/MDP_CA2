@@ -143,6 +143,7 @@
     <ClCompile Include="box_collider.cpp" />
     <ClCompile Include="button.cpp" />
     <ClCompile Include="circle_collider.cpp" />
+    <ClCompile Include="client_protocol.cpp" />
     <ClCompile Include="command.cpp" />
     <ClCompile Include="command_queue.cpp" />
     <ClCompile Include="component.cpp" />
@@ -171,9 +172,11 @@
     <ClCompile Include="pickup_spawner.cpp" />
     <ClCompile Include="player_barrier.cpp" />
     <ClCompile Include="player_controller.cpp" />
+    <ClCompile Include="player_data.cpp" />
     <ClCompile Include="polygon_collider.cpp" />
     <ClCompile Include="score.cpp" />
     <ClCompile Include="game_data.cpp" />
+    <ClCompile Include="server_protocol.cpp" />
     <ClCompile Include="shape_node.cpp" />
     <ClCompile Include="scene_node.cpp" />
     <ClCompile Include="settings_state.cpp" />
@@ -193,6 +196,7 @@
     <ClInclude Include="ball.hpp" />
     <ClInclude Include="box_collider.hpp" />
     <ClInclude Include="circle_collider.hpp" />
+    <ClInclude Include="client_protocol.hpp" />
     <ClInclude Include="e_button_type.hpp" />
     <ClInclude Include="button.hpp" />
     <ClInclude Include="command.hpp" />
@@ -226,9 +230,11 @@
     <ClInclude Include="player_barrier.hpp" />
     <ClInclude Include="player_controller.hpp" />
     <ClInclude Include="e_receiver_categories.hpp" />
+    <ClInclude Include="player_data.hpp" />
     <ClInclude Include="polygon_collider.hpp" />
     <ClInclude Include="score.hpp" />
     <ClInclude Include="game_data.hpp" />
+    <ClInclude Include="server_protocol.hpp" />
     <ClInclude Include="shape_node.hpp" />
     <ClInclude Include="resource_holder.hpp" />
     <ClInclude Include="resource_identifiers.hpp" />

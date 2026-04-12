@@ -2,30 +2,59 @@
 * Written in class, edited by:
 * Petr Sulc - GD4b - D00261476
 */
+#include <SFML/Network/Packet.hpp>
+#include <SFML/System/Sleep.hpp>
+
+#include <iostream>
 
 #include "game_server.hpp"
 #include "utility.hpp"
-#include <SFML/Network/Packet.hpp>
-#include <SFML/System/Sleep.hpp>
-#include <iostream>
+#include "server_protocol.hpp"
+#include "client_protocol.hpp"
 
 GameServer::GameServer()
-    : m_thread(&GameServer::ExecutionThread, this)
+    : m_thread(nullptr)
     , m_listening_state(false)
     , m_client_timeout(sf::seconds(1.f))
     , m_max_connected_players(20)
     , m_connected_players(0)
     , m_peers(1)
     , m_waiting_thread_end(false)
+    , m_server_running(false)
+	, m_in_game(false)
+	, m_current_level(0)
 {
     m_listener_socket.setBlocking(false);
-    m_peers[0].reset(new RemotePeer);
 }
 
 GameServer::~GameServer()
 {
-    m_waiting_thread_end = true;
-    m_thread.join();
+    End();
+}
+
+void GameServer::Start()
+{
+    std::cout << "Server Start" << std::endl;
+    if (m_server_running) return;
+    m_peers.clear();
+    m_peers.emplace_back(new RemotePeer);
+    m_server_running = true;
+    m_waiting_thread_end = false;
+	m_current_level = 0;
+    m_thread = std::make_unique<std::thread>(& GameServer::ExecutionThread, this);
+}
+
+void GameServer::End()
+{
+    if (m_thread)
+    {
+        m_waiting_thread_end = true;
+        m_thread->join();
+        m_thread.release();
+        m_server_running = false;
+    }
+    SetListening(false);
+    m_peers.clear();
 }
 
 void GameServer::SetListening(bool enable)
@@ -73,7 +102,14 @@ void GameServer::ExecutionThread()
 
 void GameServer::Tick()
 {
+    if (!m_in_game)
+    {
+        ReadyCheck();
+    }
+    else
+    {
 
+    }
 }
 
 sf::Time GameServer::Now() const
@@ -118,10 +154,58 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
     uint8_t packet_type;
     packet >> packet_type;
 
-    if (packet_type == 1) // Player wants to leave the server
+    switch (static_cast<ClientProtocol::PacketType>(packet_type))
     {
+    case ClientProtocol::PacketType::kEmpty:
+    {
+        ClientProtocol::Empty empty_packet(packet);
+        break;
+    }
+    case ClientProtocol::PacketType::kIntroduceSelf:
+    {
+        ClientProtocol::IntroduceSelf intro(packet);
+		receiving_peer.m_player_data.name = intro.name;
+		receiving_peer.m_player_data.character = intro.characterId;
+
+        std::cout << "Player " << receiving_peer.m_player_data.id << " introduced themselves as " << intro.name
+			<< " with character id " << static_cast<int>(intro.characterId) << std::endl;
+
+		sf::Packet response = ServerProtocol::PlayerJoined(
+            receiving_peer.m_player_data.id,
+            receiving_peer.m_player_data.character,
+            receiving_peer.m_player_data.name,
+            receiving_peer.m_player_data.team
+        ).asPacket();
+		SendToAll(response);
+        break;
+    }
+    case ClientProtocol::PacketType::kLeaveGame:
+    {
+        ClientProtocol::LeaveGame leave_game(packet); 
         receiving_peer.m_timed_out = true;
         detected_timeout = true;
+        break;
+    }
+    case ClientProtocol::PacketType::kLobbyUpdateSelf:
+    {
+        ClientProtocol::LobbyUpdateSelf lobby_update(packet);
+		receiving_peer.m_player_data.lobby_ready = lobby_update.isReady;
+		receiving_peer.m_player_data.character = lobby_update.characterId;
+		receiving_peer.m_player_data.name = lobby_update.name;
+        
+        sf::Packet response = ServerProtocol::LobbyPlayerUpdate(
+            receiving_peer.m_player_data.id,
+            receiving_peer.m_player_data.lobby_ready,
+            receiving_peer.m_player_data.character,
+			receiving_peer.m_player_data.name
+        ).asPacket();
+        SendToAll(response);
+        break;
+    }
+    default:
+    {
+        break;
+    }
     }
 }
 
@@ -134,12 +218,21 @@ void GameServer::HandleIncomingConnections()
 
     if (m_listener_socket.accept(m_peers[m_connected_players]->m_socket) == sf::TcpListener::Status::Done)
     {
-        InformWorldState(m_peers[m_connected_players]->m_socket);
+		uint8_t assigned_id = GetFreeID();
+		uint8_t assigned_team = GetFreeTeam();
+		m_peers[m_connected_players]->m_player_data.id = assigned_id;
+        m_peers[m_connected_players]->m_player_data.team = assigned_team;
 
-        // Player init packet
-        sf::Packet packet;
-        // fill with data for the player init
+		std::vector<PlayerData> player_list;
+        for(auto& peer : m_peers)
+        {
+            if (peer->m_ready)
+            {
+                player_list.push_back(peer->m_player_data);
+            }
+        }
 
+        sf::Packet packet = ServerProtocol::WelcomePlayer(assigned_id, assigned_team, player_list).asPacket();
         auto _ = m_peers[m_connected_players]->m_socket.send(packet);
         m_peers[m_connected_players]->m_ready = true;
         m_peers[m_connected_players]->m_last_packet_time = Now();
@@ -164,35 +257,23 @@ void GameServer::HandleDisconnections()
         if ((*itr)->m_timed_out)
         {
             //Inform everyone of a disconnection, erase
-            sf::Packet packet;
-            // fill with packet and player id
+            sf::Packet packet = ServerProtocol::PlayerLeft((*itr)->m_player_data.id).asPacket();
             SendToAll(packet);
-
             m_connected_players--;
-
             itr = m_peers.erase(itr);
-
-            //If the number of peers has dropped below max_connections
-            if (m_connected_players < m_max_connected_players)
-            {
-                m_peers.emplace_back(PeerPtr(new RemotePeer()));
-                SetListening(true);
-            }
         }
         else
         {
             ++itr;
         }
     }
-}
 
-void GameServer::InformWorldState(sf::TcpSocket& socket)
-{
-    sf::Packet packet;
-
-    //fill with world state data for the new player
-
-    auto _ = socket.send(packet);
+    //If the number of peers has dropped below max_connections
+    if (m_connected_players < m_max_connected_players)
+    {
+        m_peers.emplace_back(PeerPtr(new RemotePeer()));
+        SetListening(true);
+    }
 }
 
 void GameServer::SendToAll(sf::Packet& packet)
@@ -206,11 +287,72 @@ void GameServer::SendToAll(sf::Packet& packet)
     }
 }
 
+uint8_t GameServer::GetFreeID() const
+{
+    for (int i = 0; i < 255; ++i)
+    {
+        bool id_taken = false;
+        for (const PeerPtr& peer : m_peers)
+        {
+            if (peer->m_player_data.id == i)
+            {
+                id_taken = true;
+                break;
+            }
+        }
+        if (!id_taken)
+        {
+            return i;
+        }
+    }
+    return 255;
+}
+
+uint8_t GameServer::GetFreeTeam() const
+{
+    int teamOne = 0;
+    int teamTwo = 1;
+    for (const PeerPtr& peer : m_peers)
+    {
+        if (peer->m_player_data.team == 0)
+        {
+            teamOne++;
+        }
+        else
+        {
+            teamTwo++;
+        }
+    }
+    return (teamOne <= teamTwo) ? 0 : 1;
+}
+
+void GameServer::ReadyCheck()
+{
+    bool all_ready = true;
+    for (const PeerPtr& peer : m_peers)
+    {
+        if (peer->m_ready && !peer->m_player_data.lobby_ready)
+        {
+            all_ready = false;
+            break;
+        }
+	}
+
+    if (all_ready && m_connected_players > 1)
+    {
+        m_in_game = true;
+        std::cout << "All players ready, starting game!" << std::endl;
+		sf::Packet packet = ServerProtocol::GameStart(0).asPacket();
+		SendToAll(packet);
+	}
+}
+
 //It is essential to set the sockets to non-blocking - m_socket.setBlocking(false)
 //otherwise the server will hang waiting to read input from a connection
 GameServer::RemotePeer::RemotePeer()
     : m_ready(false)
     , m_timed_out(false)
+    , m_player_data()
 {
     m_socket.setBlocking(false);
 }

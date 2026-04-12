@@ -18,7 +18,10 @@ Application::Application() :
 		PlayerController(ReceiverCategories::kPlayer, 0),
 		PlayerController(ReceiverCategories::kPlayer, 1)
 	},
-	m_stack(StateStack::Context(m_window, m_textures, m_fonts, m_shaders, m_players, m_music, m_sound, m_game_data))
+	m_game_server(),
+	m_game_client(),
+	m_stack(StateStack::Context(m_window, m_textures, m_fonts, m_shaders, m_players, m_music, m_sound, m_game_data,
+		m_game_client, m_game_server))
 {
 	m_window.setKeyRepeatEnabled(false);
 
