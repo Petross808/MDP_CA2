@@ -1,6 +1,7 @@
 /*
 * Written by:
 * Petr Sulc - GD4b - D00261476
+* Jakub Polacek - GD4b - D00260171
 */
 
 #pragma once
@@ -16,18 +17,24 @@ class Paddle : public Pawn
 {
 public:
 	Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue,
-		SoundPlayer& sounds, sf::Texture* texture = nullptr);
+		SoundPlayer& sounds, sf::Texture* texture = nullptr, bool multiplayer = false);
 	void ApplyMove(float x, float y) override;
-	void SetPickup(PickupID pickup_id); // Jakub Polacek - GD4b - D00260171
-	void UsePickup() override; // Jakub Polacek - GD4b - D00260171
+	void SetPickup(PickupID pickup_id);
+	void UsePickup() override;
 
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
-
+	virtual void OnCollision(Collider& other, CommandQueue& command_queue) override;
 private:
 	float m_speed;
+	bool m_multiplayer;
+	bool m_disabled;
+	float m_disabled_timer;
+	float m_disabled_cooldown;
+
 	sf::Vector2f m_move_vector;
 	PhysicsBody m_physics_body;
+	Collider* m_collider;
 	CommandQueue& m_command_queue;
 	SoundPlayer& m_sounds;
 	PickupID m_pickup_id;

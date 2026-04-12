@@ -1,6 +1,7 @@
 /*
 * Written by:
 * Petr Sulc - GD4b - D00261476
+* Jakub Polacek - GD4b - D00260171
 */
 
 #include "paddle.hpp"
@@ -13,9 +14,13 @@
 #include "utility.hpp"
 #include "ball.hpp"
 
-Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue, SoundPlayer& sounds, sf::Texture* texture) :
+Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue, SoundPlayer& sounds, sf::Texture* texture, bool multiplayer) :
 	Pawn(playerId),
 	m_speed(5000),
+	m_multiplayer(multiplayer),
+	m_disabled(false),
+	m_disabled_timer(5),
+	m_disabled_cooldown(m_disabled_timer),
 	m_move_vector(),
 	m_physics_body(this, &physics, 10.f, 500.f, 80.f, 0.5f, 0.7f),
 	m_command_queue(command_queue),
@@ -81,6 +86,7 @@ Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics
 	m_physics_body.SetAsKinematic();
 
 	std::unique_ptr<Collider> collider = std::make_unique<PolygonCollider>(0.f, 0.f, polygon, &physics, &m_physics_body);
+	m_collider = collider.get();
 	collider->SetLayer(CollisionLayer::kPlayer);
 	collider->SetIgnoreLayers(CollisionLayer::kPlayer);
 	AttachChild(std::move(collider));
@@ -100,7 +106,6 @@ void Paddle::ApplyMove(float x, float y)
 	m_move_vector.y += y;
 }
 
-// Jakub Polacek - GD4b - D00260171
 void Paddle::SetPickup(PickupID pickup_id)
 {
 	m_pickup_id = pickup_id;
@@ -128,7 +133,6 @@ void Paddle::SetPickup(PickupID pickup_id)
 	}
 }
 
-// Jakub Polacek - GD4b - D00260171
 void Paddle::UsePickup()
 {
 	if (m_pickup_id == PickupID::kNone) return;
@@ -174,6 +178,29 @@ void Paddle::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		m_physics_body.AddForce(force.x, force.y);
 		m_move_vector = { 0, 0 };
 	}
+
+	if (m_multiplayer && m_disabled)
+	{
+		if (m_disabled_cooldown <= 0)
+		{
+			m_collider->SetLayer(CollisionLayer::kPlayer);
+			m_shape->SetColor(sf::Color(255, 255, 255, 255));
+			m_disabled = false;
+			m_disabled_cooldown = m_disabled_timer;
+		}
+		else
+		{
+			m_disabled_cooldown -= dt.asSeconds();
+		}
+	}
 }
 
-
+void Paddle::OnCollision(Collider& other, CommandQueue& command_queue)
+{
+	if (m_multiplayer && other.GetLayer() & CollisionLayer::kBall)
+	{
+		m_disabled = true;
+		m_collider->SetLayer(CollisionLayer::kPlayerDisabled);
+		m_shape->SetColor(sf::Color(255,255,255,128));
+	}
+}
