@@ -109,7 +109,10 @@ void World::BuildScene()
 		Level::CreateClassic(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
 		break;
 	case 1:
-		Level::CreateDiamond(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
+		Level::CreateJagged(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
+		break;
+	case 2:
+		Level::CreateDeadly(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
 		break;
 	default:
 		break;

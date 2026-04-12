@@ -20,5 +20,5 @@ constexpr auto kPickupDropChance = 3;
 constexpr auto kPointsToWin = 11;
 constexpr auto kGameOverToMenuPause = 5;
 
-constexpr auto kLevelCount = 2;
+constexpr auto kLevelCount = 3;
 constexpr auto kCharacterCount = 4;
