@@ -6,7 +6,7 @@
 
 #pragma once
 // Metadata
-constexpr auto kWindowTitle = "Game";
+constexpr auto kWindowTitle = "Ultra Pong";
 constexpr auto kWindowWidth = 1600;
 constexpr auto kWindowHeight = 900;
 
@@ -18,7 +18,7 @@ constexpr auto kTimePerFrame = 1.f / 60.f;
 constexpr auto kInitialBallSpeed = 10.f;
 constexpr auto kPickupDropChance = 3;
 constexpr auto kPointsToWin = 11;
-constexpr auto kGameOverToMenuPause = 3;
+constexpr auto kGameOverToMenuPause = 5;
 
 constexpr auto kLevelCount = 2;
 constexpr auto kCharacterCount = 4;

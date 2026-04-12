@@ -28,6 +28,8 @@ SoundPlayer::SoundPlayer()
 	m_sound_buffers.Load(SoundID::kPickupSpawn, "Media/Sound/powerup_spawn.wav");
 	m_sound_buffers.Load(SoundID::kPickupCollect, "Media/Sound/powerup_pickup.wav");
 	m_sound_buffers.Load(SoundID::kPickupUse, "Media/Sound/powerup_use.wav");
+	m_sound_buffers.Load(SoundID::kGameOverWin, "Media/Sound/game_over_win.wav");
+	m_sound_buffers.Load(SoundID::kGameOverLose, "Media/Sound/game_over_lose.wav");
 
 	// Listener points towards the screen (default in SFML)
 	sf::Listener::setDirection({ 0.f, 0.f, -1.f });
