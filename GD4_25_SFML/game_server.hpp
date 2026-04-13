@@ -17,6 +17,8 @@
 
 #include "server_protocol.hpp"
 #include "client_protocol.hpp"
+#include "world_simulation.hpp"
+#include "network_controller.hpp"
 
 class GameServer
 {
@@ -43,6 +45,7 @@ private:
 		bool m_timed_out;
 
 		PlayerData m_player_data;
+		NetworkController m_player_controller;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
@@ -82,7 +85,9 @@ private:
 	std::vector<PeerPtr> m_peers;
 	bool m_waiting_thread_end;
 
-	uint8_t m_current_level;
 	bool m_in_game;
+	std::unique_ptr<WorldSimulation> m_world_sim;
+	GameData m_game_data;
+
 };
 

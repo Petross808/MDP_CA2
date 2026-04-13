@@ -22,7 +22,8 @@ GameServer::GameServer()
     , m_waiting_thread_end(false)
     , m_server_running(false)
 	, m_in_game(false)
-	, m_current_level(0)
+    , m_world_sim(nullptr)
+    , m_game_data()
 {
     m_listener_socket.setBlocking(false);
 }
@@ -40,7 +41,7 @@ void GameServer::Start()
     m_peers.emplace_back(new RemotePeer);
     m_server_running = true;
     m_waiting_thread_end = false;
-	m_current_level = 0;
+	m_game_data.SetLevel(0);
     m_thread = std::make_unique<std::thread>(& GameServer::ExecutionThread, this);
 }
 
@@ -79,7 +80,9 @@ void GameServer::ExecutionThread()
     //Initialisation
     SetListening(true);
 
-    sf::Time tick_rate = sf::seconds(1.f / 20.f);
+    sf::Time frame_rate = sf::seconds(1.f / 60.f);
+    sf::Time frame_time = sf::Time::Zero;
+    sf::Time tick_rate = sf::seconds(1.f / 5.f);
     sf::Time tick_time = sf::Time::Zero;
     sf::Clock frame_clock, tick_clock;
 
@@ -89,8 +92,27 @@ void GameServer::ExecutionThread()
         HandleIncomingConnections();
         HandleIncomingPackets();
 
+        frame_time += frame_clock.getElapsedTime();
+        frame_clock.restart();
         tick_time += tick_clock.getElapsedTime();
         tick_clock.restart();
+
+        //Fixed time step
+        while (frame_time >= frame_rate)
+        {
+            if (m_world_sim)
+            {
+                m_world_sim->Update(frame_rate);
+                for (auto& peer : m_peers)
+                {
+                    if (peer->m_ready)
+                    {
+                        peer->m_player_controller.Update(m_world_sim->GetCommandQueue());
+                    }
+                }
+            }
+            frame_time -= frame_rate;
+        }
 
         while (tick_time >= tick_rate)
         {
@@ -108,7 +130,11 @@ void GameServer::Tick()
     }
     else
     {
-
+        if (m_world_sim)
+        {
+            sf::Packet packet = ServerProtocol::PhysicsSync(m_world_sim->GetPhysicsState()).asPacket();
+            SendToAll(packet);
+        }
     }
 }
 
@@ -202,6 +228,18 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
         SendToAll(response);
         break;
     }
+    case ClientProtocol::PacketType::kChangeLevel:
+    {
+        ClientProtocol::ChangeLevel change_level(packet);
+        m_game_data.SetLevel(change_level.levelId);
+        break;
+    }
+    case ClientProtocol::PacketType::kActionSelf:
+    {
+        ClientProtocol::ActionSelf action_self(packet);
+        receiving_peer.m_player_controller.ApplyNetworkInput(action_self.actionId, action_self.isPressed, action_self.isRealTime);
+        break;
+    }
     default:
     {
         break;
@@ -222,7 +260,7 @@ void GameServer::HandleIncomingConnections()
 		uint8_t assigned_team = GetFreeTeam();
 		m_peers[m_connected_players]->m_player_data.id = assigned_id;
         m_peers[m_connected_players]->m_player_data.team = assigned_team;
-
+        m_peers[m_connected_players]->m_player_controller.SetID(assigned_id);
 		std::vector<PlayerData> player_list;
         for(auto& peer : m_peers)
         {
@@ -340,9 +378,22 @@ void GameServer::ReadyCheck()
 
     if (all_ready && m_connected_players > 1)
     {
+        m_game_data.Reset();
+        m_world_sim.reset(new WorldSimulation(m_game_data));
+
+        for (auto& peer : m_peers)
+        {
+            if (peer->m_ready)
+            {
+                m_world_sim->SpawnPlayerPawn(peer->m_player_data.team, peer->m_player_data.id, peer->m_player_data.character);
+            }
+        }
+
         m_in_game = true;
         std::cout << "All players ready, starting game!" << std::endl;
-		sf::Packet packet = ServerProtocol::GameStart(0).asPacket();
+        uint64_t seed = Now().asMicroseconds();
+        m_game_data.SetSeed(seed);
+		sf::Packet packet = ServerProtocol::GameStart(m_game_data.GetSelectedLevel(), seed).asPacket();
 		SendToAll(packet);
 	}
 }
@@ -353,6 +404,7 @@ GameServer::RemotePeer::RemotePeer()
     : m_ready(false)
     , m_timed_out(false)
     , m_player_data()
+    , m_player_controller()
 {
     m_socket.setBlocking(false);
 }

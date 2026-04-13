@@ -15,6 +15,9 @@ GameState::GameState(StateStack& stack) :
 {
 	GetContext().music->Play(MusicID::kGameMusic);
 	GetContext().game_data->Reset();
+	
+	m_world.SpawnPlayerPawn(0, 0, GetContext().game_data->GetSelectedCharacter(0));
+	m_world.SpawnPlayerPawn(1, 1, GetContext().game_data->GetSelectedCharacter(1));
 }
 
 void GameState::Draw()

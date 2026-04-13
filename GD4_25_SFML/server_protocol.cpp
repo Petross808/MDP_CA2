@@ -126,11 +126,12 @@ sf::Packet ServerProtocol::LobbyPlayerUpdate::asPacket() const
 }
 
 
-// --- Player Left Packet ---
-ServerProtocol::GameStart::GameStart(uint8_t levelId) : levelId(levelId) {}
+// --- Game Start Packet ---
+ServerProtocol::GameStart::GameStart(uint8_t levelId, uint64_t seed) : levelId(levelId), seed(seed) {}
 ServerProtocol::GameStart::GameStart(sf::Packet& packet)
 {
 	packet >> this->levelId;
+	packet >> this->seed;
 }
 
 sf::Packet ServerProtocol::GameStart::asPacket() const
@@ -138,5 +139,45 @@ sf::Packet ServerProtocol::GameStart::asPacket() const
 	sf::Packet packet;
 	packet << static_cast<uint8_t>(PacketType::kGameStart);
 	packet << levelId;
+	packet << seed;
+	return packet;
+}
+
+
+// --- Physics Sync Packet ---
+ServerProtocol::PhysicsSync::PhysicsSync(Physics::PhysicsState state) : state(state) {}
+ServerProtocol::PhysicsSync::PhysicsSync(sf::Packet& packet)
+{
+	uint8_t size;
+	packet >> size;
+
+	float xPos, yPos, xVel, yVel;
+	for (int i = 0; i < size; ++i)
+	{
+		packet >> xPos;
+		packet >> yPos;
+		packet >> xVel;
+		packet >> yVel;
+
+		state.positions.emplace_back(sf::Vector2f(xPos, yPos));
+		state.velocities.emplace_back(sf::Vector2f(xVel, yVel));
+	}
+}
+
+sf::Packet ServerProtocol::PhysicsSync::asPacket() const
+{
+	sf::Packet packet;
+	packet << static_cast<uint8_t>(PacketType::kPhysicsSync);
+	uint8_t size = static_cast<uint8_t>(state.positions.size());
+	packet << size;
+	
+	for (int i = 0; i < size; ++i)
+	{
+		packet << state.positions[i].x;
+		packet << state.positions[i].y;
+		packet << state.velocities[i].x;
+		packet << state.velocities[i].y;
+	}
+
 	return packet;
 }

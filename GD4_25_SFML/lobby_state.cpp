@@ -5,12 +5,15 @@
 
 #include <SFML/Network/IpAddress.hpp>
 
+#include <regex>
+
 #include "lobby_state.hpp"
 #include "button.hpp"
 #include "menu_state.hpp"
 #include "label.hpp"
 #include "utility.hpp"
-#include <regex>
+#include "network_game_state.hpp"
+
 
 LobbyState::LobbyState(StateStack& stack) :
 	State(stack),
@@ -368,5 +371,12 @@ void LobbyState::UpdatePlayer(PlayerData& player)
 void LobbyState::ClearPlayers()
 {
 	m_player_labels.clear();
+}
+
+void LobbyState::StartGame(int levelId, uint64_t seed)
+{
+	GetContext().game_data->SetSeed(seed);
+	GetContext().game_data->SetLevel(levelId);
+	RequestStackPush<NetworkGameState>();
 }
 

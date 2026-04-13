@@ -105,3 +105,25 @@ void Physics::SimulateAllBodies(sf::Time dt)
 		body->Simulate(dt);
 	}
 }
+
+Physics::PhysicsState Physics::GetPhysicsState() const
+{
+	PhysicsState state;
+	
+	for (auto& body : m_physics_body_vector)
+	{
+		state.positions.emplace_back(body->GetPosition());
+		state.velocities.emplace_back(body->GetVelocity());
+	}
+
+	return state;
+}
+
+void Physics::ApplyPhysicsState(PhysicsState& state)
+{
+	for (int i = 0; i < m_physics_body_vector.size(); ++i)
+	{
+		m_physics_body_vector[i]->SetPosition(state.positions[i]);
+		m_physics_body_vector[i]->SetVelocity(state.velocities[i].x, state.velocities[i].y);
+	}
+}

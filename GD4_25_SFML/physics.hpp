@@ -16,6 +16,13 @@ class Physics
 {
 public:
 	typedef std::pair<Collider*, Collider*> Pair;
+
+	struct PhysicsState
+	{
+		std::vector<sf::Vector2f> positions;
+		std::vector<sf::Vector2f> velocities;
+	};
+
 private:
 	std::vector<Collider*> m_dynamic_object_vector;
 	std::vector<Collider*> m_static_object_vector;
@@ -30,4 +37,8 @@ public:
 	void Unregister(PhysicsBody* body);
 	void EvaluateAllCollisions(std::vector<Pair>& result);
 	void SimulateAllBodies(sf::Time dt);
+
+	PhysicsState GetPhysicsState() const;
+	void ApplyPhysicsState(PhysicsState& state);
+	
 };

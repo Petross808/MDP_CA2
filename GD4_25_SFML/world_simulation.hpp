@@ -5,49 +5,35 @@
 */
 
 #pragma once
-#include <SFML/Graphics.hpp>
-
-#include <random>
-
-#include "resource_identifiers.hpp"
 #include "scene_node.hpp"
 #include "command_queue.hpp"
-#include "sound_player.hpp"
 #include "physics.hpp"
 #include "game_data.hpp"
+#include <random>
 
-class World
+class WorldSimulation
 {
 public:
-	explicit World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds, ShaderHolder& shaders, GameData & game_data);
+	explicit WorldSimulation(GameData& game_data);
 	void Update(sf::Time dt);
-	void Draw();
 
 	CommandQueue& GetCommandQueue();
 	void SetSeed(uint64_t seed);
-	Physics& GetPhysics();
+	Physics::PhysicsState GetPhysicsState() const;
+
 	void SpawnPlayerPawn(int teamId, int playerId, int characterId);
 
 private:
-	void LoadTextures();
 	void BuildScene();
 	sf::FloatRect GetViewBounds() const;
 	void HandleCollisions();
-	void UpdateSounds();
 
 private:
-	sf::RenderTarget& m_target;
-	sf::RenderTexture m_scene_texture;
-	sf::View m_camera;
-	TextureHolder m_textures;
-	FontHolder& m_fonts;
-	SoundPlayer& m_sounds;
-	ShaderHolder& m_shaders;
 	SceneNode m_scene_graph;
 	sf::FloatRect m_world_bounds;
 	CommandQueue m_command_queue;
 	Physics m_physics;
-	
+
 	GameData& m_game_data;
 	std::default_random_engine m_random;
 };

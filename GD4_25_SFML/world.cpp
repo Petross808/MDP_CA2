@@ -8,6 +8,7 @@
 #include "level.hpp"
 #include "sound_node.hpp"
 #include "score.hpp"
+#include "player_spawn.hpp"
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds, ShaderHolder& shaders, GameData & game_data)
 	: m_target(output_target)
@@ -20,6 +21,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	, m_world_bounds(sf::Vector2f(0.f, 0.f), sf::Vector2f(m_camera.getSize().x, m_camera.getSize().y))
 	, m_physics()
 	, m_game_data(game_data)
+	, m_random((unsigned int)std::time(nullptr))
 {
 	static_cast<void>(m_scene_texture.resize({ m_target.getSize().x, m_target.getSize().y }));
 	LoadTextures();
@@ -106,13 +108,13 @@ void World::BuildScene()
 	switch (m_game_data.GetSelectedLevel())
 	{
 	case 0:
-		Level::CreateClassic(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
+		Level::CreateClassic(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds);
 		break;
 	case 1:
-		Level::CreateJagged(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
+		Level::CreateJagged(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds);
 		break;
 	case 2:
-		Level::CreateDeadly(m_scene_graph, m_physics, m_textures, m_world_bounds, m_sounds, m_game_data, m_command_queue);
+		Level::CreateDeadly(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds);
 		break;
 	default:
 		break;
@@ -148,4 +150,28 @@ void World::UpdateSounds()
 	m_sounds.SetListenerPosition(listener_position);
 
 	m_sounds.RemoveStoppedSounds();
+}
+
+void World::SetSeed(uint64_t seed)
+{
+	m_random = std::default_random_engine((unsigned int)seed);
+}
+
+Physics& World::GetPhysics()
+{
+	return m_physics;
+}
+
+void World::SpawnPlayerPawn(int teamId, int playerId, int characterId)
+{
+	Command spawn(DerivedAction<PlayerSpawn>(
+		[this, teamId, playerId, characterId](PlayerSpawn& p, sf::Time dt)
+		{
+			if (p.GetTeamId() == teamId)
+			{
+				p.SpawnPlayer(playerId, characterId);
+			}
+		}
+	), ReceiverCategories::kPlayerSpawn);
+	m_command_queue.Push(std::move(spawn));
 }

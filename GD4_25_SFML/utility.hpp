@@ -6,6 +6,7 @@
 
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <random>
 
 class Utility
 {
@@ -18,10 +19,12 @@ public:
 	static double ToDegrees(double angle);
 	static int RandomInt(int exclusive_max);
 	static int RandomInt(int inclusive_min, int exclusive_max);
+	static int RandomInt(int inclusive_min, int exclusive_max, std::default_random_engine& random);
 	static float Length(sf::Vector2f vector);
 	static float SqrLength(sf::Vector2f vector);
 	static float DotProduct(sf::Vector2f first, sf::Vector2f second);
 	static sf::Vector2f Abs(sf::Vector2f vector);
 	static sf::FloatRect GetPolygonBound(std::vector<sf::Vector2f> vertices);
+	static void SetRandomSeed(unsigned long seed);
 };
 

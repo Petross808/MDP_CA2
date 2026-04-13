@@ -12,7 +12,8 @@ GameData::GameData() :
 	m_team_two_score(0),
 	m_selected_level(0),
 	m_selected_player_one(),
-	m_selected_player_two()
+	m_selected_player_two(),
+	m_seed(0)
 {
 }
 
@@ -120,6 +121,20 @@ void GameData::CycleLevel()
 void GameData::CycleCharacter(int player_id)
 {
 	SetSelectedCharacter(player_id, (GetSelectedCharacter(player_id) + 1) % kCharacterCount);
+}
+
+void GameData::SetSeed(uint64_t seed)
+{
+	m_seed = seed;
+}
+uint64_t GameData::GetSeed() const
+{
+	return m_seed;
+}
+
+bool GameData::IsOnline() const
+{
+	return m_network_mode != NetworkMode::kLocal;
 }
 
 void GameData::Reset()

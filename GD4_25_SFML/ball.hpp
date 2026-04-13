@@ -9,11 +9,12 @@
 #include "scene_node.hpp"
 #include "physics.hpp"
 #include "paddle.hpp"
+#include <random>
 
 class Ball : public SceneNode
 {
 public:
-	Ball(float x, float y, float radius, Physics* physics, sf::Texture* texture = nullptr);
+	Ball(float x, float y, float radius, Physics* physics, std::default_random_engine& rand, sf::Texture* texture = nullptr);
 	~Ball();
 	virtual void OnCollision(Collider& other, CommandQueue& command_queue) override;
 	void GivePickup(PickupID pickup_id);
@@ -33,6 +34,7 @@ private:
 	Command m_bounce_sound;
 	int m_bounce_limit;
 	float m_speed_limit;
+	std::default_random_engine& m_random;
 };
 
 

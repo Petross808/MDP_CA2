@@ -85,3 +85,26 @@ sf::Packet ClientProtocol::ChangeLevel::asPacket() const
 	packet << this->levelId;
 	return packet;
 }
+
+
+// --- Action Self Packet ---
+ClientProtocol::ActionSelf::ActionSelf(ActionID actionId, bool isPressed, bool isRealTime) :
+	actionId(actionId), isPressed(isPressed), isRealTime(isRealTime) {}
+ClientProtocol::ActionSelf::ActionSelf(sf::Packet& packet)
+{
+	uint8_t actionId;
+	packet >> actionId;
+	packet >> this->isPressed;
+	packet >> this->isRealTime;
+	this->actionId = static_cast<ActionID>(actionId);
+}
+
+sf::Packet ClientProtocol::ActionSelf::asPacket() const
+{
+	sf::Packet packet;
+	packet << static_cast<uint8_t>(PacketType::kActionSelf);
+	packet << static_cast<uint8_t>(actionId);
+	packet << isPressed;
+	packet << isRealTime;
+	return packet;
+}

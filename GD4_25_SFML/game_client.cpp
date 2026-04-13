@@ -9,6 +9,8 @@
 #include "game_server.hpp"
 #include "client_protocol.hpp"
 #include "lobby_state.hpp"
+#include "utility.hpp"
+#include "network_game_state.hpp"
 
 #include <iostream>
 
@@ -16,7 +18,8 @@ GameClient::GameClient() :
 	m_status(ConnectionStatus::kNone), m_client_running(false),
 	m_local_player(),
 	m_player_list(0),
-	m_lobby(nullptr)
+	m_lobby(nullptr),
+	m_game_state(nullptr)
 {
 	m_socket.setBlocking(false);
 }
@@ -38,6 +41,11 @@ void GameClient::End()
 	m_lobby = nullptr;
 	m_client_running = false;
 	DisconnectFromServer();
+}
+
+void GameClient::SetGameState(NetworkGameState* state)
+{
+	m_game_state = state;
 }
 
 void GameClient::Update(sf::Time dt)
@@ -143,6 +151,11 @@ PlayerData& GameClient::GetPlayer(uint8_t playerId)
 	return m_local_player; // Fallback to local player
 }
 
+std::vector<PlayerData>& GameClient::GetPlayerList()
+{
+	return m_player_list;
+}
+
 void GameClient::UpdatePlayerOnRemote()
 {
 	sf::Packet packet = ClientProtocol::LobbyUpdateSelf(m_local_player.lobby_ready, m_local_player.character, m_local_player.name).asPacket();
@@ -152,6 +165,12 @@ void GameClient::UpdatePlayerOnRemote()
 void GameClient::ChangeLevelOnRemote(uint8_t levelId)
 {
 	sf::Packet packet = ClientProtocol::ChangeLevel(levelId).asPacket();
+	SendPacket(packet);
+}
+
+void GameClient::DoActionOnRemote(ActionID actionId, bool isPressed, bool isRealTime)
+{
+	sf::Packet packet = ClientProtocol::ActionSelf(actionId, isPressed, isRealTime).asPacket();
 	SendPacket(packet);
 }
 
@@ -222,6 +241,25 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			if (m_lobby)
 			{
 				m_lobby->UpdatePlayer(player);
+			}
+			break;
+		}
+		case ServerProtocol::PacketType::kGameStart:
+		{
+			ServerProtocol::GameStart game_start(packet);
+			std::cout << "Game is starting!" << std::endl;
+			if(m_lobby)
+			{
+				m_lobby->StartGame(game_start.levelId, game_start.seed);
+			}
+			break;
+		}
+		case ServerProtocol::PacketType::kPhysicsSync:
+		{
+			ServerProtocol::PhysicsSync physics_sync(packet);
+			if (m_game_state)
+			{
+				m_game_state->GetWorld().GetPhysics().ApplyPhysicsState(physics_sync.state);
 			}
 			break;
 		}

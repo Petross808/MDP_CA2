@@ -3,6 +3,8 @@
 #include <SFML/Network/Packet.hpp>
 
 #include "player_data.hpp"
+#include "e_action.hpp"
+#include "physics.hpp"
 
 namespace ServerProtocol
 {
@@ -14,6 +16,8 @@ namespace ServerProtocol
 		kPlayerLeft,
 		kLobbyPlayerUpdate,
 		kGameStart,
+		kPlayerAction,
+		kPhysicsSync
 	};
 
 	struct Empty
@@ -75,10 +79,21 @@ namespace ServerProtocol
 	struct GameStart
 	{
 	public:
-		GameStart(uint8_t levelId);
+		GameStart(uint8_t levelId, uint64_t seed);
 		GameStart(sf::Packet& packet);
 		sf::Packet asPacket() const;
 	public:
 		uint8_t levelId;
+		uint64_t seed;
+	};
+
+	struct PhysicsSync
+	{
+	public:
+		PhysicsSync(Physics::PhysicsState state);
+		PhysicsSync(sf::Packet& packet);
+		sf::Packet asPacket() const;
+	public:
+		Physics::PhysicsState state;
 	};
 }

@@ -6,6 +6,14 @@
 #include "score.hpp"
 #include "text_node.hpp"
 
+Score::Score(GameData& game_data) :
+	SceneNode(ReceiverCategories::kScore),
+	m_game_data(game_data),
+	m_text(nullptr),
+	m_team_one(0),
+	m_team_two(0)
+{}
+
 Score::Score(float x, float y, FontHolder& fonts, GameData& game_data) : 
 	SceneNode(ReceiverCategories::kScore),
 	m_game_data(game_data),
@@ -40,6 +48,7 @@ void Score::IncrementTeamTwo()
 
 void Score::UpdateText()
 {
+	if (!m_text) return;
 	sf::String text(std::to_string(m_team_one) + " : " + std::to_string(m_team_two));
 	m_text->setString(text);
 	m_text->setOrigin(m_text->getLocalBounds().getCenter());

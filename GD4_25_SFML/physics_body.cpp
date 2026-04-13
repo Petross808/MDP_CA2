@@ -71,6 +71,17 @@ void PhysicsBody::Simulate(sf::Time dt)
 	m_acceleration = { 0,0 };
 }
 
+sf::Vector2f PhysicsBody::GetPosition() const
+{
+	return m_controlled_object->getPosition();
+}
+
+void PhysicsBody::SetPosition(sf::Vector2f pos)
+{
+	m_controlled_object->setPosition(pos);
+}
+
+
 sf::Vector2f PhysicsBody::GetVelocity() const
 {
 	return m_velocity;

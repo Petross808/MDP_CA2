@@ -174,6 +174,21 @@
     <ClCompile Include="player_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="e_action.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_game_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="world_simulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="player_spawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utility.hpp">
@@ -357,6 +372,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="player_data.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_game_state.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="world_simulation.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_controller.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player_spawn.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

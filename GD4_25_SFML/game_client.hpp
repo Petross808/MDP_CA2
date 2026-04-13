@@ -12,8 +12,10 @@
 
 #include "e_connection_status.hpp"
 #include "player_data.hpp"
+#include "e_action.hpp"
 
 class LobbyState;
+class NetworkGameState;
 
 class GameClient
 {
@@ -27,6 +29,8 @@ public:
 	void Start(LobbyState* lobby);
 	void End();
 
+	void SetGameState(NetworkGameState* state);
+
 	void Update(sf::Time dt);
 
 	ConnectionStatus GetStatus() const;
@@ -39,9 +43,11 @@ public:
 
 	PlayerData& GetLocalPlayer();
 	PlayerData& GetPlayer(uint8_t playerId);
+	std::vector<PlayerData>& GetPlayerList();
 
 	void UpdatePlayerOnRemote();
 	void ChangeLevelOnRemote(uint8_t levelId);
+	void DoActionOnRemote(ActionID actionId, bool isPressed, bool isRealTime);
 
 private:
 	void HandlePacket(uint8_t packet_type, sf::Packet& packet);
@@ -56,4 +62,5 @@ private:
 	std::vector<PlayerData> m_player_list;
 
 	LobbyState* m_lobby;
+	NetworkGameState* m_game_state;
 };

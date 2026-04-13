@@ -33,6 +33,11 @@ public:
 
 	void SetLevel(int level);
 
+	void SetSeed(uint64_t seed);
+	uint64_t GetSeed() const;
+
+	bool IsOnline() const;
+
 	void Reset();
 
 private:
@@ -43,5 +48,6 @@ private:
 	int m_selected_level;
 	int m_selected_player_one;
 	int m_selected_player_two;
+	uint64_t m_seed;
 };
 

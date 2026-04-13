@@ -14,7 +14,7 @@
 #include "utility.hpp"
 #include "ball.hpp"
 
-Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue, SoundPlayer& sounds, sf::Texture* texture, bool multiplayer) :
+Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue, SoundPlayer* sounds, sf::Texture* texture, bool multiplayer) :
 	Pawn(playerId),
 	m_speed(5000),
 	m_multiplayer(multiplayer),
@@ -88,7 +88,7 @@ Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics
 	std::unique_ptr<Collider> collider = std::make_unique<PolygonCollider>(0.f, 0.f, polygon, &physics, &m_physics_body);
 	m_collider = collider.get();
 	collider->SetLayer(CollisionLayer::kPlayer);
-	collider->SetIgnoreLayers(CollisionLayer::kPlayer);
+	collider->SetIgnoreLayers(CollisionLayer::kPlayer | CollisionLayer::kPlayerDisabled);
 	AttachChild(std::move(collider));
 
 	std::unique_ptr<ShapeNode> shape(new ShapeNode(polygon));
@@ -162,7 +162,11 @@ void Paddle::UsePickup()
 			break;
 	}
 
-	m_sounds.Play(SoundID::kPickupUse);
+	if (m_sounds)
+	{
+
+		m_sounds->Play(SoundID::kPickupUse);
+	}
 	m_pickup_id = PickupID::kNone;
 	if (m_shape != nullptr)
 	{

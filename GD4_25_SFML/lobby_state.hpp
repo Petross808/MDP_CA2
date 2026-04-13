@@ -25,6 +25,8 @@ public:
 	void UpdatePlayer(PlayerData& player);
 	void ClearPlayers();
 
+	void StartGame(int levelId, uint64_t seed);
+
 private:
 	void HandleIpInput(const sf::Event& event);
 	void HandleNameInput(const sf::Event& event);
