@@ -37,6 +37,8 @@ public:
 	void SetAsKinematic();
 	bool IsKinematic() const;
 
+	bool IsProxy() const;
+
 	void Reset();
 
 private:

@@ -17,7 +17,8 @@ namespace ServerProtocol
 		kLobbyPlayerUpdate,
 		kGameStart,
 		kPlayerAction,
-		kPhysicsSync
+		kPhysicsSync,
+		kPlayerUsePickup
 	};
 
 	struct Empty
@@ -95,5 +96,28 @@ namespace ServerProtocol
 		sf::Packet asPacket() const;
 	public:
 		Physics::PhysicsState state;
+	};
+
+	struct PlayerUsePickup
+	{
+	public:
+		PlayerUsePickup(uint8_t player_id);
+		PlayerUsePickup(sf::Packet& packet);
+		sf::Packet asPacket() const;
+	public:
+		uint8_t player_id;
+	};
+
+	struct ActionPlayer
+	{
+	public:
+		ActionPlayer(uint8_t playerId, ActionID actionId, bool isPressed, bool isRealTime);
+		ActionPlayer(sf::Packet& packet);
+		sf::Packet asPacket() const;
+	public:
+		uint8_t playerId;
+		ActionID actionId;
+		bool isPressed;
+		bool isRealTime;
 	};
 }

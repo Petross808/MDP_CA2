@@ -26,6 +26,11 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	static_cast<void>(m_scene_texture.resize({ m_target.getSize().x, m_target.getSize().y }));
 	LoadTextures();
 	BuildScene();
+
+	if (game_data.GetNetworkMode() == NetworkMode::kClient)
+	{
+		m_physics.m_proxy = true;
+	}
 }
 
 void World::Update(sf::Time dt)

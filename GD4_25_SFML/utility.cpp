@@ -8,6 +8,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <random>
+#include <iostream>
 
 namespace
 {
@@ -84,7 +85,9 @@ int Utility::RandomInt(int inclusive_min, int exclusive_max)
 int Utility::RandomInt(int inclusive_min, int exclusive_max, std::default_random_engine& random)
 {
     std::uniform_int_distribution<> distr(inclusive_min, exclusive_max - 1);
-    return distr(random);
+    int output = distr(random);
+    std::cout << output << std::endl;
+    return output;
 }
 
 float Utility::Length(sf::Vector2f vector)

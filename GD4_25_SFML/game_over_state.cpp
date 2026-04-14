@@ -54,8 +54,8 @@ bool GameOverState::Update(sf::Time dt)
     m_elapsed_time += dt;
     if (m_elapsed_time > sf::seconds(kGameOverToMenuPause))
     {
-        RequestStackClear();
-        RequestStackPush<MenuState>();
+        RequestStackPop();
+        RequestStackPop();
     }
     return false;
 }

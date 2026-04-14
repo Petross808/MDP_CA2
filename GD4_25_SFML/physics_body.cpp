@@ -130,6 +130,11 @@ bool PhysicsBody::IsKinematic() const
 	return m_kinematic;
 }
 
+bool PhysicsBody::IsProxy() const
+{
+	return m_physics->m_proxy;
+}
+
 void PhysicsBody::Reset()
 {
 	m_acceleration = {0, 0};

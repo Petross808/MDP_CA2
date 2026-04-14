@@ -13,6 +13,7 @@
 #include "e_connection_status.hpp"
 #include "player_data.hpp"
 #include "e_action.hpp"
+#include "network_controller.hpp"
 
 class LobbyState;
 class NetworkGameState;
@@ -60,6 +61,7 @@ private:
 
 	PlayerData m_local_player;
 	std::vector<PlayerData> m_player_list;
+	std::vector<std::unique_ptr<NetworkController>> m_network_controllers;
 
 	LobbyState* m_lobby;
 	NetworkGameState* m_game_state;

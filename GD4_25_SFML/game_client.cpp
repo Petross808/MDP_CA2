@@ -11,6 +11,7 @@
 #include "lobby_state.hpp"
 #include "utility.hpp"
 #include "network_game_state.hpp"
+#include "pawn.hpp"
 
 #include <iostream>
 
@@ -19,7 +20,8 @@ GameClient::GameClient() :
 	m_local_player(),
 	m_player_list(0),
 	m_lobby(nullptr),
-	m_game_state(nullptr)
+	m_game_state(nullptr),
+	m_network_controllers(0)
 {
 	m_socket.setBlocking(false);
 }
@@ -90,6 +92,14 @@ void GameClient::Update(sf::Time dt)
 			uint8_t packet_type;
 			packet >> packet_type;
 			HandlePacket(packet_type, packet);
+		}
+	}
+
+	if (m_game_state)
+	{
+		for (auto& controller : m_network_controllers)
+		{
+			controller->Update(m_game_state->GetWorld().GetCommandQueue());
 		}
 	}
 }
@@ -208,6 +218,7 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 		{
 			ServerProtocol::PlayerJoined player_joined(packet);
 			std::cout << "Player " << player_joined.name << " joined the game!" << std::endl;
+
 			PlayerData& data = m_player_list.emplace_back(
 				player_joined.playerId,
 				player_joined.name,
@@ -250,6 +261,12 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			std::cout << "Game is starting!" << std::endl;
 			if(m_lobby)
 			{
+				for (auto& player : m_player_list)
+				{
+					auto cont = std::make_unique<NetworkController>();
+					m_network_controllers.emplace_back(std::move(cont));
+					m_network_controllers[m_network_controllers.size() - 1]->SetID(player.id);
+				}
 				m_lobby->StartGame(game_start.levelId, game_start.seed);
 			}
 			break;
@@ -260,6 +277,31 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			if (m_game_state)
 			{
 				m_game_state->GetWorld().GetPhysics().ApplyPhysicsState(physics_sync.state);
+			}
+			break;
+		}
+		case ServerProtocol::PacketType::kPlayerUsePickup:
+		{
+			ServerProtocol::PlayerUsePickup playerPickup(packet);
+			Command pickup(DerivedAction<Pawn>(
+				[this, playerPickup](Pawn& p, sf::Time dt)
+				{
+					if (p.IsID(playerPickup.player_id)) p.UsePickup();
+				}
+			), ReceiverCategories::kPlayer);
+			m_game_state->GetWorld().GetCommandQueue().Push(std::move(pickup));
+			break;
+		}
+		case ServerProtocol::PacketType::kPlayerAction:
+		{
+			ServerProtocol::ActionPlayer action(packet);
+			for (auto& controller : m_network_controllers)
+			{
+				if (controller->GetID() == action.playerId)
+				{
+					std::cout << "Apply input for " << action.playerId << std::endl;
+					controller->ApplyNetworkInput(action.actionId, action.isPressed, action.isRealTime);
+				}
 			}
 			break;
 		}

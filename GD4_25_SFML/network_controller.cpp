@@ -38,7 +38,8 @@ void NetworkController::Update(CommandQueue& commandQueue)
             {
                 m_action_state[i] = false;
             }
-            commandQueue.Push(action.GetCommand());
+            
+            commandQueue.Push(std::move(action.GetCommand()));
         }
     }
 }

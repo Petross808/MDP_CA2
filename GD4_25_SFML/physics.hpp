@@ -28,6 +28,9 @@ private:
 	std::vector<Collider*> m_static_object_vector;
 	std::vector<PhysicsBody*> m_physics_body_vector;
 
+public:
+	bool m_proxy;
+
 private:
 	void CheckCollision(Collider* first, Collider* second, std::vector<Pair>& collisions);
 public:

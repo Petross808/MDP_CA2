@@ -40,6 +40,13 @@ void NetworkGameState::Draw()
 bool NetworkGameState::Update(sf::Time dt)
 {
 	m_world.Update(dt);
+
+	if (GetContext().game_data->GetTeamOneScore() >= 3 ||
+		GetContext().game_data->GetTeamTwoScore() >= 3)
+	{
+		RequestStackPush<GameOverState>();
+	}
+
 	return true;
 }
 

@@ -82,7 +82,7 @@ void GameServer::ExecutionThread()
 
     sf::Time frame_rate = sf::seconds(1.f / 60.f);
     sf::Time frame_time = sf::Time::Zero;
-    sf::Time tick_rate = sf::seconds(1.f / 5.f);
+    sf::Time tick_rate = sf::seconds(1.f / 15.f);
     sf::Time tick_time = sf::Time::Zero;
     sf::Clock frame_clock, tick_clock;
 
@@ -238,6 +238,21 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
     {
         ClientProtocol::ActionSelf action_self(packet);
         receiving_peer.m_player_controller.ApplyNetworkInput(action_self.actionId, action_self.isPressed, action_self.isRealTime);
+        /*
+        if (action_self.actionId == ActionID::kUsePickup)
+        {
+            sf::Packet response = ServerProtocol::PlayerUsePickup(receiving_peer.m_player_data.id).asPacket();
+            SendToAll(response);
+        }
+        */
+
+        sf::Packet response = ServerProtocol::ActionPlayer(
+            receiving_peer.m_player_data.id,
+            action_self.actionId,
+            action_self.isPressed,
+            action_self.isRealTime).asPacket();
+
+        SendToAll(response);
         break;
     }
     default:
@@ -378,7 +393,9 @@ void GameServer::ReadyCheck()
 
     if (all_ready && m_connected_players > 1)
     {
+        uint64_t seed = Now().asMicroseconds();
         m_game_data.Reset();
+        m_game_data.SetSeed(seed);
         m_world_sim.reset(new WorldSimulation(m_game_data));
 
         for (auto& peer : m_peers)
@@ -391,8 +408,6 @@ void GameServer::ReadyCheck()
 
         m_in_game = true;
         std::cout << "All players ready, starting game!" << std::endl;
-        uint64_t seed = Now().asMicroseconds();
-        m_game_data.SetSeed(seed);
 		sf::Packet packet = ServerProtocol::GameStart(m_game_data.GetSelectedLevel(), seed).asPacket();
 		SendToAll(packet);
 	}
