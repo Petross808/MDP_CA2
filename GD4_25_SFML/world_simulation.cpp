@@ -66,14 +66,14 @@ bool WorldSimulation::CheckScore()
 	return false;
 }
 
-void WorldSimulation::SpawnPlayerPawn(int teamId, int playerId, int characterId)
+void WorldSimulation::SpawnPlayerPawn(int teamId, int playerId, int characterId, int numberOfPlayers)
 {
 	Command spawn(DerivedAction<PlayerSpawn>(
-		[this, teamId, playerId, characterId](PlayerSpawn& p, sf::Time dt)
+		[this, teamId, playerId, characterId, numberOfPlayers](PlayerSpawn& p, sf::Time dt)
 		{
 			if (p.GetTeamId() == teamId)
 			{
-				p.SpawnPlayer(playerId, characterId);
+				p.SpawnPlayer(playerId, characterId, numberOfPlayers);
 			}
 		}
 	), ReceiverCategories::kPlayerSpawn);

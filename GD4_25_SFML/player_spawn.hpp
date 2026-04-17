@@ -10,7 +10,7 @@ public:
 	PlayerSpawn(int teamId, bool online, float x, float y, Physics& physics, CommandQueue& command_queue,
 		SoundPlayer* sounds, sf::Texture* texture);
 	int GetTeamId() const;
-	void SpawnPlayer(int playerId, int characterId);
+	void SpawnPlayer(int playerId, int characterId, int numberOfPlayers);
 
 private:
 	int m_team_id;

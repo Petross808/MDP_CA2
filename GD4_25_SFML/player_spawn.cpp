@@ -21,10 +21,11 @@ int PlayerSpawn::GetTeamId() const
 	return m_team_id;
 }
 
-void PlayerSpawn::SpawnPlayer(int playerId, int characterId)
+void PlayerSpawn::SpawnPlayer(int playerId, int characterId, int numberOfPlayers)
 {
 	std::cout << "Spawn Player " << playerId << std::endl;
 	std::unique_ptr<Paddle> paddle(new Paddle(playerId, characterId, 0, 0,
 		m_physics, m_command_queue, m_sounds, m_texture, m_online));
+	paddle->UpdateByNumberOfPlayers(numberOfPlayers);
 	this->AttachChild(std::move(paddle));
 }

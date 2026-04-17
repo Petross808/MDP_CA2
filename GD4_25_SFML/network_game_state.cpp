@@ -21,6 +21,22 @@ NetworkGameState::NetworkGameState(StateStack& stack) :
 	}
 	GetContext().client->SetGameState(this);
 	
+	int team_one_players = 0;
+	int team_two_players = 0;
+	for (auto& player : GetContext().client->GetPlayerList())
+	{
+		if (player.team == 0)
+		{
+			++team_one_players;
+		}
+		else
+		{
+			++team_two_players;
+		}
+	}
+	GetContext().game_data->SetTeamOnePlayers(team_one_players);
+	GetContext().game_data->SetTeamTwoPlayers(team_two_players);
+
 	for (auto& player : GetContext().client->GetPlayerList())
 	{
 		m_world.SpawnPlayerPawn(player.team, player.id, player.character);

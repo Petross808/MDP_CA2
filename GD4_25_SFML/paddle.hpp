@@ -19,6 +19,7 @@ public:
 	Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue,
 		SoundPlayer* sounds = nullptr, sf::Texture* texture = nullptr, bool multiplayer = false);
 	void ApplyMove(float x, float y) override;
+	void UpdateByNumberOfPlayers(int number_of_players);
 	void SetPickup(PickupID pickup_id);
 	void UsePickup() override;
 

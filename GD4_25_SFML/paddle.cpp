@@ -19,7 +19,7 @@ Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics
 	m_speed(5000),
 	m_multiplayer(multiplayer),
 	m_disabled(false),
-	m_disabled_timer(5),
+	m_disabled_timer(0),
 	m_disabled_cooldown(m_disabled_timer),
 	m_move_vector(),
 	m_physics_body(this, &physics, 10.f, 500.f, 80.f, 0.5f, 0.7f),
@@ -104,6 +104,12 @@ void Paddle::ApplyMove(float x, float y)
 {
 	m_move_vector.x += x;
 	m_move_vector.y += y;
+}
+
+void Paddle::UpdateByNumberOfPlayers(int number_of_players)
+{
+	m_disabled_timer = number_of_players * 1.5f;
+	
 }
 
 void Paddle::SetPickup(PickupID pickup_id)
@@ -204,6 +210,7 @@ void Paddle::OnCollision(Collider& other, CommandQueue& command_queue)
 	if (m_multiplayer && other.GetLayer() & CollisionLayer::kBall)
 	{
 		m_disabled = true;
+		m_disabled_cooldown = m_disabled_timer;
 		m_collider->SetLayer(CollisionLayer::kPlayerDisabled);
 		m_shape->SetColor(sf::Color(255,255,255,128));
 	}

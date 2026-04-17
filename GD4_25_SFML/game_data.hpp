@@ -14,12 +14,16 @@ public:
 	~GameData();
 
 	NetworkMode GetNetworkMode() const;
+	int GetTeamOnePlayers() const;
+	int GetTeamTwoPlayers() const;
 	int GetTeamOneScore() const;
 	int GetTeamTwoScore() const;
 	int GetSelectedLevel() const;
 	int GetSelectedCharacter(int player_id) const;
 
 	void SetNetworkMode(NetworkMode mode);
+	void SetTeamOnePlayers(int players);
+	void SetTeamTwoPlayers(int players);
 	void SetTeamOneScore(int score);
 	void SetTeamTwoScore(int score);
 	void SetSelectedLevel(int level);
@@ -43,6 +47,8 @@ public:
 private:
 	NetworkMode m_network_mode;
 
+	int m_team_one_players;
+	int m_team_two_players;
 	int m_team_one_score;
 	int m_team_two_score;
 	int m_selected_level;

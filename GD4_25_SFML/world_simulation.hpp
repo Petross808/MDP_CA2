@@ -23,11 +23,10 @@ public:
 	std::vector<std::pair<int, int>>& GetCollisionData();
 	bool CheckScore();
 
-	void SpawnPlayerPawn(int teamId, int playerId, int characterId);
+	void SpawnPlayerPawn(int teamId, int playerId, int characterId, int numberOfPlayers);
 
 private:
 	void BuildScene();
-	sf::FloatRect GetViewBounds() const;
 	void HandleCollisions();
 
 private:

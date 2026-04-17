@@ -424,11 +424,35 @@ void GameServer::ReadyCheck()
         m_game_data.SetSeed(seed);
         m_world_sim.reset(new WorldSimulation(m_game_data));
 
+        int team_one_players = 0;
+        int team_two_players = 0;
         for (auto& peer : m_peers)
         {
             if (peer->m_ready)
             {
-                m_world_sim->SpawnPlayerPawn(peer->m_player_data.team, peer->m_player_data.id, peer->m_player_data.character);
+                if (peer->m_player_data.team == 0)
+                {
+                    ++team_one_players;
+                }
+                else
+                {
+                    ++team_two_players;
+                }
+            }
+        }
+
+        for (auto& peer : m_peers)
+        {
+            if (peer->m_ready)
+            {
+                if (peer->m_player_data.team == 0)
+                {
+                    m_world_sim->SpawnPlayerPawn(peer->m_player_data.team, peer->m_player_data.id, peer->m_player_data.character, team_one_players);
+                }
+                else
+                {
+                    m_world_sim->SpawnPlayerPawn(peer->m_player_data.team, peer->m_player_data.id, peer->m_player_data.character, team_two_players);
+                }
             }
         }
 

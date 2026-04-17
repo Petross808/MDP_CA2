@@ -176,7 +176,15 @@ void World::SpawnPlayerPawn(int teamId, int playerId, int characterId)
 		{
 			if (p.GetTeamId() == teamId)
 			{
-				p.SpawnPlayer(playerId, characterId);
+				if (teamId == 0)
+				{
+					p.SpawnPlayer(playerId, characterId, m_game_data.GetTeamOnePlayers());
+				}
+				else
+				{
+					p.SpawnPlayer(playerId, characterId, m_game_data.GetTeamTwoPlayers());
+
+				}
 			}
 		}
 	), ReceiverCategories::kPlayerSpawn);
