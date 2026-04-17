@@ -309,23 +309,20 @@ void LobbyState::HandleNameInput(const sf::Event& event)
 	}
 
 	const auto* text_entered = event.getIf<sf::Event::TextEntered>();
-	if (text_entered && text_entered->unicode < 128)
+	if (text_entered && text_entered->unicode == 8) // Backspace
 	{
-		if (text_entered->unicode == 8) // Backspace
+		std::string current_text = m_name_input->GetText();
+		if (!current_text.empty())
 		{
-			std::string current_text = m_name_input->GetText();
-			if (!current_text.empty())
-			{
-				current_text.pop_back();
-				m_name_input->SetText(current_text);
-			}
+			current_text.pop_back();
+			m_name_input->SetText(current_text);
 		}
-		else if(m_name_input->GetText().size() < 20)
-		{
-			char symbol = static_cast<char>(text_entered->unicode);
-			std::string appended_name = m_name_input->GetText() + symbol;
-			m_name_input->SetText(appended_name);
-		}
+	}
+	if (text_entered && text_entered->unicode > 31 && text_entered->unicode < 128 && m_name_input->GetText().size() < 20)
+	{
+		char symbol = static_cast<char>(text_entered->unicode);
+		std::string appended_name = m_name_input->GetText() + symbol;
+		m_name_input->SetText(appended_name);
 	}
 }
 

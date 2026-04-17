@@ -33,7 +33,7 @@ namespace ClientProtocol
 		sf::Packet asPacket() const;
 	public:
 		std::string name;
-		int characterId;
+		uint8_t characterId;
 	};
 
 	struct LeaveGame

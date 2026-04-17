@@ -25,10 +25,8 @@ ServerProtocol::WelcomePlayer::WelcomePlayer(sf::Packet& packet)
 	for (uint8_t i = 0; i < playerCount; ++i)
 	{
 		PlayerData player;
-		char name[20];
 		packet >> player.id;
-		packet >> name;
-		player.name = std::string(name);
+		packet >> player.name;
 		packet >> player.team;
 		packet >> player.character;
 		packet >> player.lobby_ready;
@@ -46,8 +44,7 @@ sf::Packet ServerProtocol::WelcomePlayer::asPacket() const
 	for (const auto& player : playerList)
 	{
 		packet << player.id;
-		std::string name = player.name.substr(0, 20);
-		packet << name;
+		packet << player.name;
 		packet << player.team;
 		packet << player.character;
 		packet << player.lobby_ready;
@@ -61,17 +58,14 @@ ServerProtocol::PlayerJoined::PlayerJoined(uint8_t playerId, uint8_t characterId
 	: playerId(playerId), characterId(characterId), name(name), team(team) {}
 ServerProtocol::PlayerJoined::PlayerJoined(sf::Packet& packet)
 {
-	char name[20];
 	packet >> this->playerId;
 	packet >> this->characterId;
 	packet >> this->team;
-	packet >> name;
-	this->name = std::string(name);
+	packet >> this->name;
 }
 
 sf::Packet ServerProtocol::PlayerJoined::asPacket() const
 {
-	std::string name = this->name.substr(0, 20);
 	sf::Packet packet;
 	packet << static_cast<uint8_t>(PacketType::kPlayerJoined);
 	packet << playerId;
@@ -104,12 +98,10 @@ ServerProtocol::LobbyPlayerUpdate::LobbyPlayerUpdate(uint8_t playerId, bool read
 ServerProtocol::LobbyPlayerUpdate::LobbyPlayerUpdate(sf::Packet& packet)
 {
 	uint8_t ready;
-	char name[20];
 	packet >> this->playerId;
 	packet >> ready;
 	packet >> this->characterId;
-	packet >> name;
-	this->name = std::string(name);
+	packet >> this->name;
 	this->isReady = ready != 0;
 }
 
@@ -120,8 +112,8 @@ sf::Packet ServerProtocol::LobbyPlayerUpdate::asPacket() const
 	packet << playerId;
 	packet << static_cast<uint8_t>(isReady);
 	packet << characterId;
-	std::string name = this->name.substr(0, 20);
 	packet << name;
+
 	return packet;
 }
 
