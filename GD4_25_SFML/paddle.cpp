@@ -183,7 +183,7 @@ void Paddle::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		m_move_vector = { 0, 0 };
 	}
 
-	if (m_multiplayer && m_disabled)
+	if (m_disabled)
 	{
 		if (m_disabled_cooldown <= 0)
 		{

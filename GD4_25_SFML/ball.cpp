@@ -27,6 +27,7 @@ Ball::Ball(float x, float y, float radius, Physics* physics, std::default_random
 	std::unique_ptr<Collider> collider = std::make_unique<CircleCollider>(0.f, 0.f, radius, physics, &m_physics_body);
 	collider->SetLayer(CollisionLayer::kBall);
 	collider->SetIgnoreLayers(CollisionLayer::kPlayerDisabled);
+	collider->SetReplicateCollisions(true);
 	AttachChild(std::move(collider));
 
 	std::unique_ptr<ShapeNode> shape(new ShapeNode(radius));

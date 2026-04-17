@@ -14,6 +14,7 @@ public:
 	void Update(CommandQueue& commandQueue);
 	int GetID() const;
 	void SetID(int id);
+	void Reset();
 private:
 	ReceiverCategories m_pawn_category;
 	int m_id;

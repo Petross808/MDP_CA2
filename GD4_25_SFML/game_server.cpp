@@ -27,6 +27,7 @@ GameServer::GameServer()
     , m_game_data()
 {
     m_listener_socket.setBlocking(false);
+    m_game_data.SetNetworkMode(NetworkMode::kServer);
 }
 
 GameServer::~GameServer()
@@ -121,6 +122,7 @@ void GameServer::Frame(sf::Time dt)
     {
         m_world_sim->Update(dt);
         auto& collisions = m_world_sim->GetCollisionData();
+
         if (collisions.size() > 0)
         {
             sf::Packet collisionSync = ServerProtocol::CollisionSync(collisions).asPacket();
@@ -446,6 +448,7 @@ void GameServer::ResetLobby()
         if (peer->m_ready)
         {
             peer->m_player_data.lobby_ready = false;
+            peer->m_player_controller.Reset();
         }
     }
 }

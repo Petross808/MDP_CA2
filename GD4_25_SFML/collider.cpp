@@ -12,7 +12,8 @@ Collider::Collider(float x, float y, Physics* physics, PhysicsBody* body, bool t
 	m_is_trigger(trigger),
 	m_layer(),
 	m_ignore_layers(),
-	m_id(-1)
+	m_id(-1),
+	m_replicate_collisions(false)
 {
 	m_physics->Register(this);
 	setPosition({x, y});
@@ -31,6 +32,16 @@ bool Collider::CheckCollision(Collider* other)
 int Collider::GetId() const
 {
 	return m_id;
+}
+
+void Collider::SetReplicateCollisions(bool state)
+{
+	m_replicate_collisions = state;
+}
+
+bool Collider::ShouldReplicateCollisions() const
+{
+	return m_replicate_collisions;
 }
 
 void Collider::AssignId(int id)

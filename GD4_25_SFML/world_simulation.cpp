@@ -109,7 +109,10 @@ void WorldSimulation::HandleCollisions()
 	m_collision_data.clear();
 	for (auto& collision : results)
 	{
-		m_collision_data.emplace_back(collision.first->GetId(), collision.second->GetId());
+		if (collision.first->ShouldReplicateCollisions() || collision.second->ShouldReplicateCollisions())
+		{
+			m_collision_data.emplace_back(collision.first->GetId(), collision.second->GetId());
+		}
 		collision.first->EvaluateCollision(*collision.second, m_command_queue);
 		collision.second->EvaluateCollision(*collision.first, m_command_queue);
 	}

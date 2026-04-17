@@ -53,3 +53,8 @@ void NetworkController::SetID(int id)
 {
     m_id = id;
 }
+
+void NetworkController::Reset()
+{
+    m_action_state.fill(false);
+}
