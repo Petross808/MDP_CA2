@@ -57,6 +57,7 @@ void GameServer::End()
     }
     SetListening(false);
     m_peers.clear();
+    m_connected_players = 0;
     std::cout << "Server End" << std::endl;
 }
 
@@ -342,7 +343,7 @@ void GameServer::HandleDisconnections()
     }
 
     //If the number of peers has dropped below max_connections
-    if (m_connected_players < m_max_connected_players)
+    if (m_connected_players == m_max_connected_players - 1)
     {
         m_peers.emplace_back(PeerPtr(new RemotePeer()));
         SetListening(true);
@@ -384,16 +385,19 @@ uint8_t GameServer::GetFreeID() const
 uint8_t GameServer::GetFreeTeam() const
 {
     int teamOne = 0;
-    int teamTwo = 1;
+    int teamTwo = 0;
     for (const PeerPtr& peer : m_peers)
     {
-        if (peer->m_player_data.team == 0)
+        if (peer->m_ready)
         {
-            teamOne++;
-        }
-        else
-        {
-            teamTwo++;
+            if (peer->m_player_data.team == 0)
+            {
+                teamOne++;
+            }
+            else
+            {
+                teamTwo++;
+            }
         }
     }
     return (teamOne <= teamTwo) ? 0 : 1;

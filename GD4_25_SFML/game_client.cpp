@@ -76,7 +76,7 @@ void GameClient::Update(sf::Time dt)
 	{
 		// Keep Connection Alive
 		m_tick_timer += dt;
-		if (m_tick_timer.asSeconds() >= 0.25f)
+		if (m_tick_timer.asSeconds() >= 0.5f)
 		{
 			m_tick_timer = sf::Time::Zero;
 			sf::Packet keepAlivePacket = ClientProtocol::Empty().asPacket();
@@ -245,6 +245,11 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			if (m_lobby)
 			{
 				m_lobby->RemovePlayer(player_left.playerId);
+			}
+			auto found = std::find_if(m_player_list.begin(), m_player_list.end(), [&](PlayerData& p) {return p.id == player_left.playerId; });
+			if (found != m_player_list.end())
+			{
+				m_player_list.erase(found);
 			}
 			break;
 		}
