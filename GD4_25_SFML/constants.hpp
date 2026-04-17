@@ -17,8 +17,8 @@ constexpr auto kTimePerFrame = 1.f / 60.f;
 
 constexpr auto kInitialBallSpeed = 10.f;
 constexpr auto kPickupDropChance = 3;
-constexpr auto kPointsToWin = 11;
-constexpr auto kGameOverToMenuPause = 5;
+constexpr auto kPointsToWin = 3;
+constexpr auto kGameOverToMenuPause = 2;
 
 constexpr auto kLevelCount = 3;
 constexpr auto kCharacterCount = 4;

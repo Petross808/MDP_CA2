@@ -224,3 +224,40 @@ sf::Packet ServerProtocol::ActionPlayer::asPacket() const
 	packet << isRealTime;
 	return packet;
 }
+
+
+// --- Collision Sync Packet ---
+ServerProtocol::CollisionSync::CollisionSync(std::vector<std::pair<int, int>>& collisions) : collisions(collisions)
+{
+}
+ServerProtocol::CollisionSync::CollisionSync(sf::Packet& packet)
+{
+	uint16_t size;
+	packet >> size;
+
+	uint8_t first;
+	uint8_t second;
+	for (uint16_t i = 0; i < size; i++)
+	{
+		packet >> first;
+		packet >> second;
+		collisions.emplace_back(first, second);
+	}
+}
+
+sf::Packet ServerProtocol::CollisionSync::asPacket() const
+{
+	sf::Packet packet;
+	packet << static_cast<uint8_t>(PacketType::kCollisionSync);
+	
+	uint16_t size = static_cast<uint16_t>(collisions.size());
+	packet << size;
+	
+	for (uint16_t i = 0; i < size; i++)
+	{
+		packet << static_cast<uint8_t>(collisions[i].first);
+		packet << static_cast<uint8_t>(collisions[i].second);
+	}
+
+	return packet;
+}

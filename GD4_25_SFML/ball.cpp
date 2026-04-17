@@ -96,15 +96,13 @@ void Ball::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	m_physics_body.ClampVelocity(m_speed_limit);
 
-	if (m_physics_body.IsProxy()) return;
-
 	if (m_timer <= 0) return;
 
 	m_timer -= dt.asSeconds();
 
 	if (m_timer <= 0)
 	{
-		sf::Vector2f dir(static_cast<float>(Utility::RandomInt(-90, 90)), static_cast<float>(Utility::RandomInt(-40, 40)));
+		sf::Vector2f dir(static_cast<float>(Utility::RandomInt(-90, 90, m_random)), static_cast<float>(Utility::RandomInt(-40, 40, m_random)));
 		
 		if (dir.x >= 0 && dir.x < 40)
 		{
@@ -115,7 +113,7 @@ void Ball::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 			dir.x = -40;
 		}
 
-
+		if (m_physics_body.IsProxy()) return;
 
 		m_physics_body.ApplyImpulse(kInitialBallSpeed, dir);
 	}

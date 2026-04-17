@@ -41,8 +41,8 @@ bool NetworkGameState::Update(sf::Time dt)
 {
 	m_world.Update(dt);
 
-	if (GetContext().game_data->GetTeamOneScore() >= 3 ||
-		GetContext().game_data->GetTeamTwoScore() >= 3)
+	if (GetContext().game_data->GetTeamOneScore() >= kPointsToWin ||
+		GetContext().game_data->GetTeamTwoScore() >= kPointsToWin)
 	{
 		RequestStackPush<GameOverState>();
 	}
@@ -52,8 +52,14 @@ bool NetworkGameState::Update(sf::Time dt)
 
 bool NetworkGameState::HandleEvent(const sf::Event& event)
 {
+
 	if (const auto* key_pressed = event.getIf<sf::Event::KeyPressed>())
 	{
+		if (key_pressed->scancode == sf::Keyboard::Scancode::Escape)
+		{
+			RequestStackPush<PauseState>();
+		}
+
 		for (int i = 0; i < kActionCount; ++i)
 		{
 			Action& action = m_players[0].GetActionArray()[i];

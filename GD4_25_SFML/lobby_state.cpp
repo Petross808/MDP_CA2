@@ -159,8 +159,9 @@ LobbyState::LobbyState(StateStack& stack) :
 
 LobbyState::~LobbyState()
 {
-	GetContext().client->End();
-	GetContext().server->End();
+	auto context = GetContext();
+	context.client->End();
+	context.server->End();
 }
 
 void LobbyState::Draw()
@@ -176,9 +177,10 @@ void LobbyState::Draw()
 
 bool LobbyState::Update(sf::Time dt)
 {
-	GetContext().client->Update(dt);
+	auto context = GetContext();
+	context.client->Update(dt);
 	
-	if(GetContext().client->GetLocalPlayer().lobby_ready)
+	if(context.client->GetLocalPlayer().lobby_ready)
 	{
 		m_ready_button->SetText("Cancel Ready");
 	}
@@ -190,7 +192,7 @@ bool LobbyState::Update(sf::Time dt)
 	if (m_connection_label)
 	{
 		m_ready_button->SetVisibility(false);
-		switch(GetContext().client->GetStatus())
+		switch(context.client->GetStatus())
 		{
 		case ConnectionStatus::kNone:
 			m_connection_label->SetText("No Connection", true);
@@ -217,7 +219,7 @@ bool LobbyState::Update(sf::Time dt)
 		}
 	}
 
-	if(GetContext().client->GetStatus() == ConnectionStatus::kConnected)
+	if(context.client->GetStatus() == ConnectionStatus::kConnected)
 	{
 		m_ready_button->SetVisibility(true);
 	}

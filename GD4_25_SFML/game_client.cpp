@@ -21,7 +21,8 @@ GameClient::GameClient() :
 	m_player_list(0),
 	m_lobby(nullptr),
 	m_game_state(nullptr),
-	m_network_controllers(0)
+	m_network_controllers(0),
+	m_tick_timer(sf::seconds(0))
 {
 	m_socket.setBlocking(false);
 }
@@ -74,18 +75,23 @@ void GameClient::Update(sf::Time dt)
 	if (m_status == ConnectionStatus::kConnected)
 	{
 		// Keep Connection Alive
-		sf::Packet keepAlivePacket = ClientProtocol::Empty().asPacket();
-		auto status = m_socket.send(keepAlivePacket);
-		if (status == sf::Socket::Status::Disconnected)
+		m_tick_timer += dt;
+		if (m_tick_timer.asSeconds() >= 0.25f)
 		{
-			m_status = ConnectionStatus::kTimeOut;
-			m_player_list.clear();
-			if (m_lobby)
+			m_tick_timer = sf::Time::Zero;
+			sf::Packet keepAlivePacket = ClientProtocol::Empty().asPacket();
+			auto status = m_socket.send(keepAlivePacket);
+			if (status == sf::Socket::Status::Disconnected)
 			{
-				m_lobby->ClearPlayers();
+				m_status = ConnectionStatus::kTimeOut;
+				m_player_list.clear();
+				if (m_lobby)
+				{
+					m_lobby->ClearPlayers();
+				}
 			}
 		}
-
+		
 		sf::Packet packet;
 		if (m_socket.receive(packet) == sf::Socket::Status::Done)
 		{
@@ -261,8 +267,14 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			std::cout << "Game is starting!" << std::endl;
 			if(m_lobby)
 			{
+				m_local_player.lobby_ready = false;
 				for (auto& player : m_player_list)
 				{
+					player.lobby_ready = false;
+					if (m_lobby)
+					{
+						m_lobby->UpdatePlayer(player);
+					}
 					auto cont = std::make_unique<NetworkController>();
 					m_network_controllers.emplace_back(std::move(cont));
 					m_network_controllers[m_network_controllers.size() - 1]->SetID(player.id);
@@ -289,7 +301,10 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 					if (p.IsID(playerPickup.player_id)) p.UsePickup();
 				}
 			), ReceiverCategories::kPlayer);
-			m_game_state->GetWorld().GetCommandQueue().Push(std::move(pickup));
+			if (m_game_state)
+			{
+				m_game_state->GetWorld().GetCommandQueue().Push(std::move(pickup));
+			}
 			break;
 		}
 		case ServerProtocol::PacketType::kPlayerAction:
@@ -299,10 +314,28 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			{
 				if (controller->GetID() == action.playerId)
 				{
-					std::cout << "Apply input for " << action.playerId << std::endl;
 					controller->ApplyNetworkInput(action.actionId, action.isPressed, action.isRealTime);
 				}
 			}
+			break;
+		}
+		case ServerProtocol::PacketType::kCollisionSync:
+		{
+			ServerProtocol::CollisionSync collisionSync(packet);
+			if (m_game_state)
+			{
+				CommandQueue& cq = m_game_state->GetWorld().GetCommandQueue();
+				Physics& physics = m_game_state->GetWorld().GetPhysics();
+				for (auto& collision : collisionSync.collisions)
+				{
+					physics.EvaluateCollisionById(collision.first, collision.second, cq);
+				}
+			}
+			
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}

@@ -27,7 +27,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	LoadTextures();
 	BuildScene();
 
-	if (game_data.GetNetworkMode() == NetworkMode::kClient)
+	if (game_data.GetNetworkMode() != NetworkMode::kLocal)
 	{
 		m_physics.m_proxy = true;
 	}
@@ -138,6 +138,8 @@ void World::HandleCollisions()
 {
 	std::vector<Physics::Pair> results;
 	m_physics.EvaluateAllCollisions(results);
+
+	if (m_physics.m_proxy) return;
 
 	for (auto& collision : results)
 	{

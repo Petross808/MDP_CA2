@@ -14,6 +14,7 @@ WorldSimulation::WorldSimulation(GameData& game_data)
 	: m_scene_graph(ReceiverCategories::kScene)
 	, m_world_bounds(sf::Vector2f(0.f, 0.f), sf::Vector2f(kWindowWidth, kWindowHeight))
 	, m_physics()
+	, m_collision_data()
 	, m_game_data(game_data)
 	, m_random((unsigned int)game_data.GetSeed())
 {
@@ -48,6 +49,21 @@ void WorldSimulation::SetSeed(uint64_t seed)
 Physics::PhysicsState WorldSimulation::GetPhysicsState() const
 {
 	return m_physics.GetPhysicsState();
+}
+
+std::vector<std::pair<int, int>>& WorldSimulation::GetCollisionData()
+{
+	return m_collision_data;
+}
+
+bool WorldSimulation::CheckScore()
+{
+	if (m_game_data.GetTeamOneScore() >= kPointsToWin ||
+		m_game_data.GetTeamTwoScore() >= kPointsToWin)
+	{
+		return true;
+	}
+	return false;
 }
 
 void WorldSimulation::SpawnPlayerPawn(int teamId, int playerId, int characterId)
@@ -90,8 +106,10 @@ void WorldSimulation::HandleCollisions()
 	std::vector<Physics::Pair> results;
 	m_physics.EvaluateAllCollisions(results);
 
+	m_collision_data.clear();
 	for (auto& collision : results)
 	{
+		m_collision_data.emplace_back(collision.first->GetId(), collision.second->GetId());
 		collision.first->EvaluateCollision(*collision.second, m_command_queue);
 		collision.second->EvaluateCollision(*collision.first, m_command_queue);
 	}

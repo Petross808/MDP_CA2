@@ -53,6 +53,7 @@ private:
 private:
 	void SetListening(bool enable);
 	void ExecutionThread();
+	void Frame(sf::Time dt);
 	void Tick();
 	sf::Time Now() const;
 
@@ -69,6 +70,7 @@ private:
 	uint8_t GetFreeID() const;
 	uint8_t GetFreeTeam() const;
 	void ReadyCheck();
+	void ResetLobby();
 
 
 private:

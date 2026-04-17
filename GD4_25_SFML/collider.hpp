@@ -21,6 +21,7 @@ class PolygonCollider;
 class Collider : public SceneNode
 {
 private:
+	int m_id;
 	Physics* m_physics;
 	PhysicsBody* m_physics_body;
 	bool m_is_trigger;
@@ -39,6 +40,9 @@ public:
 	virtual bool CollideWith(BoxCollider* other) = 0;
 	virtual bool CollideWith(CircleCollider* other) = 0;
 	virtual bool CollideWith(PolygonCollider* other) = 0;
+
+	int GetId() const;
+	void AssignId(int id);
 
 	bool IsDynamic() const;
 	bool IsTrigger() const;

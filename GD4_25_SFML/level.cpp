@@ -56,13 +56,12 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world
 
 	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
 	dynamic->AttachChild(std::move(team_two));
-	
-
+	/*
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, rand, *sounds, *texture_holder, 15));
+	dynamic->AttachChild(std::move(pickupSpawner));
+	*/
 	if (texture_holder)
 	{
-		std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, rand, *sounds, *texture_holder, 15));
-		dynamic->AttachChild(std::move(pickupSpawner));
-
 		std::unique_ptr<ShapeNode> player_one_zone(new ShapeNode(400, world_bounds.size.y));
 		player_one_zone->setPosition({ 0,0 });
 		player_one_zone->SetTexture(*tileGrey);

@@ -11,11 +11,12 @@
 #include "utility.hpp"
 #include "server_protocol.hpp"
 #include "client_protocol.hpp"
+#include "constants.hpp"
 
 GameServer::GameServer()
     : m_thread(nullptr)
     , m_listening_state(false)
-    , m_client_timeout(sf::seconds(1.f))
+    , m_client_timeout(sf::seconds(3.f))
     , m_max_connected_players(20)
     , m_connected_players(0)
     , m_peers(1)
@@ -56,6 +57,7 @@ void GameServer::End()
     }
     SetListening(false);
     m_peers.clear();
+    std::cout << "Server End" << std::endl;
 }
 
 void GameServer::SetListening(bool enable)
@@ -80,7 +82,7 @@ void GameServer::ExecutionThread()
     //Initialisation
     SetListening(true);
 
-    sf::Time frame_rate = sf::seconds(1.f / 60.f);
+    sf::Time frame_rate = sf::seconds(kTimePerFrame);
     sf::Time frame_time = sf::Time::Zero;
     sf::Time tick_rate = sf::seconds(1.f / 15.f);
     sf::Time tick_time = sf::Time::Zero;
@@ -100,17 +102,7 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-            if (m_world_sim)
-            {
-                m_world_sim->Update(frame_rate);
-                for (auto& peer : m_peers)
-                {
-                    if (peer->m_ready)
-                    {
-                        peer->m_player_controller.Update(m_world_sim->GetCommandQueue());
-                    }
-                }
-            }
+            Frame(frame_rate);
             frame_time -= frame_rate;
         }
 
@@ -118,6 +110,33 @@ void GameServer::ExecutionThread()
         {
             Tick();
             tick_time -= tick_rate;
+        }
+    }
+}
+
+void GameServer::Frame(sf::Time dt)
+{
+    if (m_world_sim)
+    {
+        m_world_sim->Update(dt);
+        auto& collisions = m_world_sim->GetCollisionData();
+        if (collisions.size() > 0)
+        {
+            sf::Packet collisionSync = ServerProtocol::CollisionSync(collisions).asPacket();
+            SendToAll(collisionSync);
+        }
+
+        for (auto& peer : m_peers)
+        {
+            if (peer->m_ready)
+            {
+                peer->m_player_controller.Update(m_world_sim->GetCommandQueue());
+            }
+        }
+        
+        if (m_world_sim->CheckScore())
+        {
+            ResetLobby();
         }
     }
 }
@@ -179,7 +198,8 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
 {
     uint8_t packet_type;
     packet >> packet_type;
-
+    
+    std::cout << "Server: " << (int)packet_type << std::endl;
     switch (static_cast<ClientProtocol::PacketType>(packet_type))
     {
     case ClientProtocol::PacketType::kEmpty:
@@ -411,6 +431,19 @@ void GameServer::ReadyCheck()
 		sf::Packet packet = ServerProtocol::GameStart(m_game_data.GetSelectedLevel(), seed).asPacket();
 		SendToAll(packet);
 	}
+}
+
+void GameServer::ResetLobby()
+{
+    m_in_game = false;
+    m_world_sim.release();
+    for (const PeerPtr& peer : m_peers)
+    {
+        if (peer->m_ready)
+        {
+            peer->m_player_data.lobby_ready = false;
+        }
+    }
 }
 
 //It is essential to set the sockets to non-blocking - m_socket.setBlocking(false)

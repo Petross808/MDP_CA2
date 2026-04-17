@@ -58,6 +58,7 @@ private:
 	ConnectionStatus m_status;
 	sf::TcpSocket m_socket;
 	sf::Clock m_connection_timer;
+	sf::Time m_tick_timer;
 
 	PlayerData m_local_player;
 	std::vector<PlayerData> m_player_list;

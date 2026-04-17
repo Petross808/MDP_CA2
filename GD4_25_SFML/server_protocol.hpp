@@ -18,7 +18,8 @@ namespace ServerProtocol
 		kGameStart,
 		kPlayerAction,
 		kPhysicsSync,
-		kPlayerUsePickup
+		kPlayerUsePickup,
+		kCollisionSync
 	};
 
 	struct Empty
@@ -119,5 +120,15 @@ namespace ServerProtocol
 		ActionID actionId;
 		bool isPressed;
 		bool isRealTime;
+	};
+
+	struct CollisionSync
+	{
+	public:
+		CollisionSync(std::vector<std::pair<int, int>>& collisions);
+		CollisionSync(sf::Packet& packet);
+		sf::Packet asPacket() const;
+	public:
+		std::vector<std::pair<int, int>> collisions;
 	};
 }

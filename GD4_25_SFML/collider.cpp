@@ -11,7 +11,8 @@ Collider::Collider(float x, float y, Physics* physics, PhysicsBody* body, bool t
 	m_physics_body(body),
 	m_is_trigger(trigger),
 	m_layer(),
-	m_ignore_layers()
+	m_ignore_layers(),
+	m_id(-1)
 {
 	m_physics->Register(this);
 	setPosition({x, y});
@@ -25,6 +26,16 @@ Collider::~Collider()
 bool Collider::CheckCollision(Collider* other)
 {
 	return other->CollideWith(this);
+}
+
+int Collider::GetId() const
+{
+	return m_id;
+}
+
+void Collider::AssignId(int id)
+{
+	m_id = id;
 }
 
 bool Collider::IsDynamic() const
