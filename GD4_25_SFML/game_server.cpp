@@ -26,6 +26,7 @@ GameServer::GameServer()
     , m_world_sim(nullptr)
     , m_game_data()
 {
+    m_discover_socket.setBlocking(false);
     m_listener_socket.setBlocking(false);
     m_game_data.SetNetworkMode(NetworkMode::kServer);
 }
@@ -69,11 +70,13 @@ void GameServer::SetListening(bool enable)
     {
         if (!m_listening_state)
         {
+            auto _ = m_discover_socket.bind(50001);
             m_listening_state = (m_listener_socket.listen(kServerPort) == sf::TcpListener::Status::Done);
         }
     }
     else
     {
+        m_discover_socket.unbind();
         m_listener_socket.close();
         m_listening_state = false;
     }
@@ -93,6 +96,7 @@ void GameServer::ExecutionThread()
     while (!m_waiting_thread_end)
     {
         //This is the game loop
+        HandleIncomingQueries();
         HandleIncomingConnections();
         HandleIncomingPackets();
 
@@ -281,6 +285,20 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
     }
 }
 
+void GameServer::HandleIncomingQueries()
+{
+    if (!m_listening_state) return;
+
+    sf::Packet packet;
+    std::optional<sf::IpAddress> senderAddress;
+    unsigned short senderPort;
+    if (m_discover_socket.receive(packet, senderAddress, senderPort) == sf::Socket::Status::Done)
+    {
+        sf::Packet response = ServerProtocol::Empty().asPacket();
+        auto _ = m_discover_socket.send(response, *senderAddress, senderPort);
+    }
+}
+
 void GameServer::HandleIncomingConnections()
 {
     if (!m_listening_state)
@@ -454,6 +472,7 @@ void GameServer::ReadyCheck()
             }
         }
 
+        SetListening(false);
         m_in_game = true;
         std::cout << "All players ready, starting game!" << std::endl;
 		sf::Packet packet = ServerProtocol::GameStart(m_game_data.GetSelectedLevel(), seed).asPacket();
@@ -473,6 +492,7 @@ void GameServer::ResetLobby()
             peer->m_player_controller.Reset();
         }
     }
+    SetListening(true);
 }
 
 //It is essential to set the sockets to non-blocking - m_socket.setBlocking(false)

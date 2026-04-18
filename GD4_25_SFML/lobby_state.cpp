@@ -61,6 +61,16 @@ LobbyState::LobbyState(StateStack& stack) :
 
 	if (data->GetNetworkMode() == NetworkMode::kClient)
 	{
+		auto autoJoin = std::make_shared<gui::Button>(GetContext());
+		autoJoin->setPosition(sf::Vector2f(kWindowWidth / 2.f, 50));
+		autoJoin->CentreButton();
+		autoJoin->SetText("Quick Find Server");
+		autoJoin->SetCallback([this]()
+			{
+				this->GetContext().client->FindServer();
+			});
+		m_gui_container.Pack(autoJoin);
+
 		gui::Label::Ptr ipLabel = std::make_shared<gui::Label>("Enter Server IP:", *GetContext().fonts);
 		ipLabel->setPosition(sf::Vector2f(kWindowWidth/2.f, 100));
 		ipLabel->GetTextRef().setCharacterSize(24);
