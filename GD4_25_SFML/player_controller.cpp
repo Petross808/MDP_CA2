@@ -12,15 +12,15 @@ PlayerController::PlayerController(ReceiverCategories pawn_category, int player_
     m_pawn_category(pawn_category),
     m_action_array
     {
-        Action("Move Up", true, Key::W,
+        Action(ActionID::kMoveUp, "Move Up", true, Key::W,
             Command(DerivedAction<Pawn>([this](Pawn& p, sf::Time dt) { if (p.IsID(m_id)) p.ApplyMove(0, -1); }), m_pawn_category)),
-        Action("Move Down", true, Key::S,
+        Action(ActionID::kMoveDown, "Move Down", true, Key::S,
             Command(DerivedAction<Pawn>([this](Pawn& p, sf::Time dt) { if (p.IsID(m_id)) p.ApplyMove(0, 1); }), m_pawn_category)),
-        Action("Move Left", true, Key::A,
+        Action(ActionID::kMoveLeft, "Move Left", true, Key::A,
             Command(DerivedAction<Pawn>([this](Pawn& p, sf::Time dt) { if (p.IsID(m_id)) p.ApplyMove(-1, 0); }), m_pawn_category)),
-        Action("Move Right", true, Key::D,
+        Action(ActionID::kMoveRight, "Move Right", true, Key::D,
             Command(DerivedAction<Pawn>([this](Pawn& p, sf::Time dt) { if (p.IsID(m_id)) p.ApplyMove(1, 0); }), m_pawn_category)),
-        Action("Use Pickup", false, Key::Space,
+        Action(ActionID::kUsePickup, "Use Pickup", false, Key::Space,
             Command(DerivedAction<Pawn>([this](Pawn& p, sf::Time dt) { if (p.IsID(m_id)) p.UsePickup(); }), m_pawn_category))
     }
 {

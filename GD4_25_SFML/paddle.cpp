@@ -14,12 +14,12 @@
 #include "utility.hpp"
 #include "ball.hpp"
 
-Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue, SoundPlayer& sounds, sf::Texture* texture, bool multiplayer) :
+Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue, SoundPlayer* sounds, sf::Texture* texture, bool multiplayer) :
 	Pawn(playerId),
 	m_speed(5000),
 	m_multiplayer(multiplayer),
 	m_disabled(false),
-	m_disabled_timer(5),
+	m_disabled_timer(0),
 	m_disabled_cooldown(m_disabled_timer),
 	m_move_vector(),
 	m_physics_body(this, &physics, 10.f, 500.f, 80.f, 0.5f, 0.7f),
@@ -88,7 +88,7 @@ Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics
 	std::unique_ptr<Collider> collider = std::make_unique<PolygonCollider>(0.f, 0.f, polygon, &physics, &m_physics_body);
 	m_collider = collider.get();
 	collider->SetLayer(CollisionLayer::kPlayer);
-	collider->SetIgnoreLayers(CollisionLayer::kPlayer);
+	collider->SetIgnoreLayers(CollisionLayer::kPlayer | CollisionLayer::kPlayerDisabled);
 	AttachChild(std::move(collider));
 
 	std::unique_ptr<ShapeNode> shape(new ShapeNode(polygon));
@@ -104,6 +104,12 @@ void Paddle::ApplyMove(float x, float y)
 {
 	m_move_vector.x += x;
 	m_move_vector.y += y;
+}
+
+void Paddle::UpdateByNumberOfPlayers(int number_of_players)
+{
+	m_disabled_timer = number_of_players * 1.5f;
+	
 }
 
 void Paddle::SetPickup(PickupID pickup_id)
@@ -162,7 +168,11 @@ void Paddle::UsePickup()
 			break;
 	}
 
-	m_sounds.Play(SoundID::kPickupUse);
+	if (m_sounds)
+	{
+
+		m_sounds->Play(SoundID::kPickupUse);
+	}
 	m_pickup_id = PickupID::kNone;
 	if (m_shape != nullptr)
 	{
@@ -179,7 +189,7 @@ void Paddle::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		m_move_vector = { 0, 0 };
 	}
 
-	if (m_multiplayer && m_disabled)
+	if (m_disabled)
 	{
 		if (m_disabled_cooldown <= 0)
 		{
@@ -200,6 +210,7 @@ void Paddle::OnCollision(Collider& other, CommandQueue& command_queue)
 	if (m_multiplayer && other.GetLayer() & CollisionLayer::kBall)
 	{
 		m_disabled = true;
+		m_disabled_cooldown = m_disabled_timer;
 		m_collider->SetLayer(CollisionLayer::kPlayerDisabled);
 		m_shape->SetColor(sf::Color(255,255,255,128));
 	}

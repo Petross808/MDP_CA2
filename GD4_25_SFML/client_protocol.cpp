@@ -16,20 +16,16 @@ sf::Packet ClientProtocol::Empty::asPacket() const
 ClientProtocol::IntroduceSelf::IntroduceSelf(uint8_t characterId, std::string& name) : characterId(characterId), name(name) {}
 ClientProtocol::IntroduceSelf::IntroduceSelf(sf::Packet& packet)
 {
-	uint8_t characterId;
-	char name[20];
-	packet >> characterId;
-	packet >> name;
-	this->characterId = characterId;
-	this->name = std::string(name);
+	packet >> this->characterId;
+	packet >> this->name;
 }
 
 sf::Packet ClientProtocol::IntroduceSelf::asPacket() const
 {
 	sf::Packet packet;
 	packet << static_cast<uint8_t>(PacketType::kIntroduceSelf);
-	packet << static_cast<uint8_t>(characterId);
-	packet << name.substr(0, 20);
+	packet << characterId;
+	packet << name;
 	return packet;
 }
 
@@ -52,11 +48,9 @@ ClientProtocol::LobbyUpdateSelf::LobbyUpdateSelf(bool isReady, uint8_t character
 ClientProtocol::LobbyUpdateSelf::LobbyUpdateSelf(sf::Packet& packet)
 {
 	uint8_t ready;
-	char name[20];
 	packet >> ready;
 	packet >> this->characterId;
-	packet >> name;
-	this->name = std::string(name);
+	packet >> this->name;
 	isReady = ready != 0;
 }
 
@@ -66,7 +60,7 @@ sf::Packet ClientProtocol::LobbyUpdateSelf::asPacket() const
 	packet << static_cast<uint8_t>(PacketType::kLobbyUpdateSelf);
 	packet << static_cast<uint8_t>(isReady);
 	packet << characterId;
-	packet << name.substr(0, 20);
+	packet << name;
 	return packet;
 }
 
@@ -83,5 +77,28 @@ sf::Packet ClientProtocol::ChangeLevel::asPacket() const
 	sf::Packet packet;
 	packet << static_cast<uint8_t>(PacketType::kChangeLevel);
 	packet << this->levelId;
+	return packet;
+}
+
+
+// --- Action Self Packet ---
+ClientProtocol::ActionSelf::ActionSelf(ActionID actionId, bool isPressed, bool isRealTime) :
+	actionId(actionId), isPressed(isPressed), isRealTime(isRealTime) {}
+ClientProtocol::ActionSelf::ActionSelf(sf::Packet& packet)
+{
+	uint8_t actionId;
+	packet >> actionId;
+	packet >> this->isPressed;
+	packet >> this->isRealTime;
+	this->actionId = static_cast<ActionID>(actionId);
+}
+
+sf::Packet ClientProtocol::ActionSelf::asPacket() const
+{
+	sf::Packet packet;
+	packet << static_cast<uint8_t>(PacketType::kActionSelf);
+	packet << static_cast<uint8_t>(actionId);
+	packet << isPressed;
+	packet << isRealTime;
 	return packet;
 }

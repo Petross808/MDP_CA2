@@ -5,6 +5,7 @@
 
 #include "physics.hpp"
 #include "utility.hpp"
+#include <iostream>
 
 void Physics::CheckCollision(Collider* first, Collider* second, std::vector<Pair>& collisions)
 {
@@ -20,8 +21,15 @@ void Physics::CheckCollision(Collider* first, Collider* second, std::vector<Pair
 	}
 }
 
+Physics::Physics() : m_next_collider_id(0), m_proxy(false)
+{
+}
+
 void Physics::Register(Collider* shape)
 {
+	shape->AssignId(m_next_collider_id);
+	++m_next_collider_id;
+
 	if (shape->IsDynamic())
 	{
 		m_dynamic_object_vector.emplace_back(shape);
@@ -103,5 +111,59 @@ void Physics::SimulateAllBodies(sf::Time dt)
 	for (auto& body : m_physics_body_vector)
 	{
 		body->Simulate(dt);
+	}
+}
+
+Physics::PhysicsState Physics::GetPhysicsState() const
+{
+	PhysicsState state;
+	
+	for (auto& body : m_physics_body_vector)
+	{
+		state.positions.emplace_back(body->GetPosition());
+		state.velocities.emplace_back(body->GetVelocity());
+	}
+
+	return state;
+}
+
+void Physics::ApplyPhysicsState(PhysicsState& state)
+{
+	for (int i = 0; i < m_physics_body_vector.size(); ++i)
+	{
+		m_physics_body_vector[i]->SetPosition(state.positions[i]);
+		m_physics_body_vector[i]->SetVelocity(state.velocities[i].x, state.velocities[i].y);
+	}
+}
+
+void Physics::EvaluateCollisionById(int first, int second, CommandQueue& command_queue)
+{
+	Collider* firstCol = nullptr;
+	Collider* secondCol = nullptr;
+	for (auto collider : m_dynamic_object_vector)
+	{
+		if (collider->GetId() == first) firstCol = collider;
+		if (collider->GetId() == second) secondCol = collider;
+	}
+
+	if (firstCol == nullptr )
+	{
+		for (auto& collider : m_static_object_vector)
+		{
+			if (collider->GetId() == first) firstCol = collider;
+		}
+	}
+	else if (secondCol == nullptr)
+	{
+		for (auto& collider : m_static_object_vector)
+		{
+			if (collider->GetId() == second) secondCol = collider;
+		}
+	}
+
+	if (firstCol && secondCol)
+	{
+		firstCol->EvaluateCollision(*secondCol, command_queue);
+		secondCol->EvaluateCollision(*firstCol, command_queue);
 	}
 }

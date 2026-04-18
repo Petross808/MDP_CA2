@@ -17,8 +17,9 @@ class Paddle : public Pawn
 {
 public:
 	Paddle(int playerId, int characterId, float x, float y, Physics& physics, CommandQueue& command_queue,
-		SoundPlayer& sounds, sf::Texture* texture = nullptr, bool multiplayer = false);
+		SoundPlayer* sounds = nullptr, sf::Texture* texture = nullptr, bool multiplayer = false);
 	void ApplyMove(float x, float y) override;
+	void UpdateByNumberOfPlayers(int number_of_players);
 	void SetPickup(PickupID pickup_id);
 	void UsePickup() override;
 
@@ -36,7 +37,7 @@ private:
 	PhysicsBody m_physics_body;
 	Collider* m_collider;
 	CommandQueue& m_command_queue;
-	SoundPlayer& m_sounds;
+	SoundPlayer* m_sounds;
 	PickupID m_pickup_id;
 	ShapeNode* m_shape;
 

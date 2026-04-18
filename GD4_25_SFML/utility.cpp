@@ -8,13 +8,21 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <random>
+#include <iostream>
 
 namespace
 {
-    std::default_random_engine CreateRandomEngine()
+    std::default_random_engine CreateRandomEngine(unsigned long seed = 0)
     {
-        auto seed = static_cast<unsigned long>(std::time(nullptr));
-        return std::default_random_engine(seed);
+        if(seed == 0)
+        {
+            auto timeSeed = static_cast<unsigned long>(std::time(nullptr));
+            return std::default_random_engine(timeSeed);
+        }
+        else
+        {
+			return std::default_random_engine(seed);
+        }
     }
     auto RandomEngine = CreateRandomEngine();
 }
@@ -63,6 +71,8 @@ double Utility::ToDegrees(double angle)
 int Utility::RandomInt(int exclusive_max)
 {
     std::uniform_int_distribution<> distr(0, exclusive_max - 1);
+
+    std::default_random_engine(seed);
     return distr(RandomEngine);
 }
 
@@ -70,6 +80,14 @@ int Utility::RandomInt(int inclusive_min, int exclusive_max)
 {
     std::uniform_int_distribution<> distr(inclusive_min, exclusive_max - 1);
     return distr(RandomEngine);
+}
+
+int Utility::RandomInt(int inclusive_min, int exclusive_max, std::default_random_engine& random)
+{
+    std::uniform_int_distribution<> distr(inclusive_min, exclusive_max - 1);
+    int output = distr(random);
+    std::cout << output << std::endl;
+    return output;
 }
 
 float Utility::Length(sf::Vector2f vector)
@@ -107,4 +125,9 @@ sf::FloatRect Utility::GetPolygonBound(std::vector<sf::Vector2f> vertices)
     }
 
     return { min, max - min };
+}
+
+void Utility::SetRandomSeed(unsigned long seed)
+{
+	RandomEngine = CreateRandomEngine(seed);
 }

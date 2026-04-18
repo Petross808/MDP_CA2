@@ -7,6 +7,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+#include <random>
+
 #include "resource_identifiers.hpp"
 #include "scene_node.hpp"
 #include "command_queue.hpp"
@@ -22,6 +24,9 @@ public:
 	void Draw();
 
 	CommandQueue& GetCommandQueue();
+	void SetSeed(uint64_t seed);
+	Physics& GetPhysics();
+	void SpawnPlayerPawn(int teamId, int playerId, int characterId);
 
 private:
 	void LoadTextures();
@@ -44,5 +49,6 @@ private:
 	Physics m_physics;
 	
 	GameData& m_game_data;
+	std::default_random_engine m_random;
 };
 

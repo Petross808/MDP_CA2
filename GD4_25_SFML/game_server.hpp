@@ -17,6 +17,9 @@
 
 #include "server_protocol.hpp"
 #include "client_protocol.hpp"
+#include "world_simulation.hpp"
+#include "network_controller.hpp"
+#include "network_tracker.h"
 
 class GameServer
 {
@@ -43,6 +46,7 @@ private:
 		bool m_timed_out;
 
 		PlayerData m_player_data;
+		NetworkController m_player_controller;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
@@ -50,6 +54,7 @@ private:
 private:
 	void SetListening(bool enable);
 	void ExecutionThread();
+	void Frame(sf::Time dt);
 	void Tick();
 	sf::Time Now() const;
 
@@ -66,6 +71,7 @@ private:
 	uint8_t GetFreeID() const;
 	uint8_t GetFreeTeam() const;
 	void ReadyCheck();
+	void ResetLobby();
 
 
 private:
@@ -82,7 +88,10 @@ private:
 	std::vector<PeerPtr> m_peers;
 	bool m_waiting_thread_end;
 
-	uint8_t m_current_level;
 	bool m_in_game;
+	std::unique_ptr<WorldSimulation> m_world_sim;
+	GameData m_game_data;
+	NetworkTracker m_network_tracker;
+
 };
 

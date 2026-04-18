@@ -8,11 +8,14 @@
 
 GameData::GameData() : 
 	m_network_mode(NetworkMode::kLocal),
+	m_team_one_players(0),
+	m_team_two_players(0),
 	m_team_one_score(0),
 	m_team_two_score(0),
 	m_selected_level(0),
 	m_selected_player_one(),
-	m_selected_player_two()
+	m_selected_player_two(),
+	m_seed(0)
 {
 }
 
@@ -21,6 +24,16 @@ GameData::~GameData() = default;
 NetworkMode GameData::GetNetworkMode() const
 {
 	return m_network_mode;
+}
+
+int GameData::GetTeamOnePlayers() const
+{
+	return m_team_one_players;
+}
+
+int GameData::GetTeamTwoPlayers() const
+{
+	return m_team_two_players;
 }
 
 int GameData::GetTeamOneScore() const
@@ -46,6 +59,16 @@ int GameData::GetSelectedCharacter(int player_id) const
 void GameData::SetNetworkMode(NetworkMode mode)
 {
 	m_network_mode = mode;
+}
+
+void GameData::SetTeamOnePlayers(int players)
+{
+	m_team_one_players = players;
+}
+
+void GameData::SetTeamTwoPlayers(int players)
+{
+	m_team_two_players = players;
 }
 
 void GameData::SetTeamOneScore(int score)
@@ -120,6 +143,20 @@ void GameData::CycleLevel()
 void GameData::CycleCharacter(int player_id)
 {
 	SetSelectedCharacter(player_id, (GetSelectedCharacter(player_id) + 1) % kCharacterCount);
+}
+
+void GameData::SetSeed(uint64_t seed)
+{
+	m_seed = seed;
+}
+uint64_t GameData::GetSeed() const
+{
+	return m_seed;
+}
+
+bool GameData::IsOnline() const
+{
+	return m_network_mode != NetworkMode::kLocal;
 }
 
 void GameData::Reset()

@@ -2,6 +2,8 @@
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Network/Packet.hpp>
 
+#include "e_action.hpp"
+
 namespace ClientProtocol
 {
 	enum class PacketType
@@ -10,7 +12,8 @@ namespace ClientProtocol
 		kIntroduceSelf,
 		kLeaveGame,
 		kLobbyUpdateSelf,
-		kChangeLevel
+		kChangeLevel,
+		kActionSelf
 	};
 
 	struct Empty
@@ -30,7 +33,7 @@ namespace ClientProtocol
 		sf::Packet asPacket() const;
 	public:
 		std::string name;
-		int characterId;
+		uint8_t characterId;
 	};
 
 	struct LeaveGame
@@ -61,6 +64,18 @@ namespace ClientProtocol
 		sf::Packet asPacket() const;
 	public:
 		uint8_t levelId;
+	};
+
+	struct ActionSelf
+	{
+	public:
+		ActionSelf(ActionID actionId, bool isPressed, bool isRealTime);
+		ActionSelf(sf::Packet& packet);
+		sf::Packet asPacket() const;
+	public:
+		ActionID actionId;
+		bool isPressed;
+		bool isRealTime;
 	};
 }
 

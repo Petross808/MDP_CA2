@@ -6,8 +6,8 @@
 
 #include "action.hpp"
 
-Action::Action(std::string name, bool realtime, sf::Keyboard::Scancode key, Command command) :
-	m_name(name), m_realtime_action(realtime), m_key_bind(key), m_command(command)
+Action::Action(ActionID id, std::string name, bool realtime, sf::Keyboard::Scancode key, Command command) :
+	m_id(id), m_name(name), m_realtime_action(realtime), m_key_bind(key), m_command(command)
 {
 }
 
@@ -34,4 +34,9 @@ sf::Keyboard::Scancode Action::GetKeyBind() const
 bool Action::IsRealTime() const
 {
 	return m_realtime_action;
+}
+
+ActionID Action::GetID() const
+{
+	return m_id;
 }

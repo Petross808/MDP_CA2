@@ -5,12 +5,15 @@
 
 #include <SFML/Network/IpAddress.hpp>
 
+#include <regex>
+
 #include "lobby_state.hpp"
 #include "button.hpp"
 #include "menu_state.hpp"
 #include "label.hpp"
 #include "utility.hpp"
-#include <regex>
+#include "network_game_state.hpp"
+
 
 LobbyState::LobbyState(StateStack& stack) :
 	State(stack),
@@ -156,8 +159,9 @@ LobbyState::LobbyState(StateStack& stack) :
 
 LobbyState::~LobbyState()
 {
-	GetContext().client->End();
-	GetContext().server->End();
+	auto context = GetContext();
+	context.client->End();
+	context.server->End();
 }
 
 void LobbyState::Draw()
@@ -173,9 +177,10 @@ void LobbyState::Draw()
 
 bool LobbyState::Update(sf::Time dt)
 {
-	GetContext().client->Update(dt);
+	auto context = GetContext();
+	context.client->Update(dt);
 	
-	if(GetContext().client->GetLocalPlayer().lobby_ready)
+	if(context.client->GetLocalPlayer().lobby_ready)
 	{
 		m_ready_button->SetText("Cancel Ready");
 	}
@@ -187,7 +192,7 @@ bool LobbyState::Update(sf::Time dt)
 	if (m_connection_label)
 	{
 		m_ready_button->SetVisibility(false);
-		switch(GetContext().client->GetStatus())
+		switch(context.client->GetStatus())
 		{
 		case ConnectionStatus::kNone:
 			m_connection_label->SetText("No Connection", true);
@@ -214,7 +219,7 @@ bool LobbyState::Update(sf::Time dt)
 		}
 	}
 
-	if(GetContext().client->GetStatus() == ConnectionStatus::kConnected)
+	if(context.client->GetStatus() == ConnectionStatus::kConnected)
 	{
 		m_ready_button->SetVisibility(true);
 	}
@@ -304,23 +309,20 @@ void LobbyState::HandleNameInput(const sf::Event& event)
 	}
 
 	const auto* text_entered = event.getIf<sf::Event::TextEntered>();
-	if (text_entered && text_entered->unicode < 128)
+	if (text_entered && text_entered->unicode == 8) // Backspace
 	{
-		if (text_entered->unicode == 8) // Backspace
+		std::string current_text = m_name_input->GetText();
+		if (!current_text.empty())
 		{
-			std::string current_text = m_name_input->GetText();
-			if (!current_text.empty())
-			{
-				current_text.pop_back();
-				m_name_input->SetText(current_text);
-			}
+			current_text.pop_back();
+			m_name_input->SetText(current_text);
 		}
-		else if(m_name_input->GetText().size() < 20)
-		{
-			char symbol = static_cast<char>(text_entered->unicode);
-			std::string appended_name = m_name_input->GetText() + symbol;
-			m_name_input->SetText(appended_name);
-		}
+	}
+	if (text_entered && text_entered->unicode > 31 && text_entered->unicode < 128 && m_name_input->GetText().size() < 20)
+	{
+		char symbol = static_cast<char>(text_entered->unicode);
+		std::string appended_name = m_name_input->GetText() + symbol;
+		m_name_input->SetText(appended_name);
 	}
 }
 
@@ -368,5 +370,12 @@ void LobbyState::UpdatePlayer(PlayerData& player)
 void LobbyState::ClearPlayers()
 {
 	m_player_labels.clear();
+}
+
+void LobbyState::StartGame(int levelId, uint64_t seed)
+{
+	GetContext().game_data->SetSeed(seed);
+	GetContext().game_data->SetLevel(levelId);
+	RequestStackPush<NetworkGameState>();
 }
 

@@ -22,6 +22,9 @@ public:
 	void Move(sf::Vector2f delta);
 	void Simulate(sf::Time dt);
 
+	sf::Vector2f GetPosition() const;
+	void SetPosition(sf::Vector2f pos);
+
 	sf::Vector2f GetVelocity() const;
 	sf::Vector2f GetDrag() const;
 	float GetMass() const;
@@ -33,6 +36,8 @@ public:
 
 	void SetAsKinematic();
 	bool IsKinematic() const;
+
+	bool IsProxy() const;
 
 	void Reset();
 

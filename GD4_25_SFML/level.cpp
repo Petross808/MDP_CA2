@@ -4,7 +4,7 @@
 */
 
 #include "level.hpp"
-#include "paddle.hpp"
+#include "player_spawn.hpp"
 #include "wall.hpp"
 #include "ball.hpp"
 #include "pickup_spawner.hpp"
@@ -27,16 +27,17 @@ void Level::CreateBounds(SceneNode& root, Physics& physics, sf::FloatRect world_
 }
 
 
-void Level::CreateClassic(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue)
+void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds)
 {
-	sf::Texture* wallGrey = &texture_holder.Get(TextureID::kWallGrey);
-	sf::Texture* wallRed = &texture_holder.Get(TextureID::kWallRed);
-	sf::Texture* stoneWhite = &texture_holder.Get(TextureID::kStoneWhite);
-	sf::Texture* stoneBlack = &texture_holder.Get(TextureID::kStoneBlack);
-	sf::Texture* tileGrey = &texture_holder.Get(TextureID::kTileGrey);
-	sf::Texture* tileChess = &texture_holder.Get(TextureID::kTileChess);
-	sf::Texture* tileGreen = &texture_holder.Get(TextureID::kTileGreen);
-	sf::Texture* fire = &texture_holder.Get(TextureID::kFire);
+	sf::Texture* wallGrey = texture_holder ? &texture_holder->Get(TextureID::kWallGrey) : nullptr;
+	sf::Texture* wallRed = texture_holder ? &texture_holder->Get(TextureID::kWallRed) : nullptr;
+	sf::Texture* stoneWhite = texture_holder ? &texture_holder->Get(TextureID::kStoneWhite) : nullptr;
+	sf::Texture* stoneBlack = texture_holder ? &texture_holder->Get(TextureID::kStoneBlack) : nullptr;
+	sf::Texture* tileGrey = texture_holder ? &texture_holder->Get(TextureID::kTileGrey) : nullptr;
+	sf::Texture* tileChess = texture_holder ? &texture_holder->Get(TextureID::kTileChess) : nullptr;
+	sf::Texture* tileGreen = texture_holder ? &texture_holder->Get(TextureID::kTileGreen) : nullptr;
+	sf::Texture* fire = texture_holder ? &texture_holder->Get(TextureID::kFire) : nullptr;
+
 
 	std::unique_ptr<SceneNode> background(new SceneNode());
 	std::unique_ptr<SceneNode> walls(new SceneNode());
@@ -46,35 +47,36 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, TextureHolder& text
 
 	sf::Vector2f center(world_bounds.getCenter());
 
-	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, fire));
+	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, rand, fire));
 	dynamic->AttachChild(std::move(ball));
 
+	
+	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(team_one));
 
-	std::unique_ptr<Paddle> paddle_one(new Paddle(0, data.GetSelectedCharacter(0), 200, center.y, physics, command_queue, sounds, stoneWhite));
-	dynamic->AttachChild(std::move(paddle_one));
-
-	std::unique_ptr<Paddle> paddle_two(new Paddle(1, data.GetSelectedCharacter(1), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
-	dynamic->AttachChild(std::move(paddle_two));
-
-
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, sounds, &texture_holder, 15));
+	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(team_two));
+	
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, rand, sounds, texture_holder, 15));
 	dynamic->AttachChild(std::move(pickupSpawner));
+	
+	if (texture_holder)
+	{
+		std::unique_ptr<ShapeNode> player_one_zone(new ShapeNode(400, world_bounds.size.y));
+		player_one_zone->setPosition({ 0,0 });
+		player_one_zone->SetTexture(*tileGrey);
+		background->AttachChild(std::move(player_one_zone));
 
+		std::unique_ptr<ShapeNode> player_two_zone(new ShapeNode(400, world_bounds.size.y));
+		player_two_zone->setPosition({ world_bounds.size.x - 400, 0 });
+		player_two_zone->SetTexture(*tileGrey);
+		background->AttachChild(std::move(player_two_zone));
 
-	std::unique_ptr<ShapeNode> player_one_zone(new ShapeNode(400, world_bounds.size.y));
-	player_one_zone->setPosition({0,0});
-	player_one_zone->SetTexture(*tileGrey);
-	background->AttachChild(std::move(player_one_zone));
-
-	std::unique_ptr<ShapeNode> player_two_zone(new ShapeNode(400, world_bounds.size.y));
-	player_two_zone->setPosition({ world_bounds.size.x - 400, 0 });
-	player_two_zone->SetTexture(*tileGrey);
-	background->AttachChild(std::move(player_two_zone));
-
-	std::unique_ptr<ShapeNode> playing_field(new ShapeNode(800, world_bounds.size.y));
-	playing_field->setPosition({ 400, 0 });
-	playing_field->SetTexture(*tileGreen);
-	background->AttachChild(std::move(playing_field));
+		std::unique_ptr<ShapeNode> playing_field(new ShapeNode(800, world_bounds.size.y));
+		playing_field->setPosition({ 400, 0 });
+		playing_field->SetTexture(*tileGreen);
+		background->AttachChild(std::move(playing_field));
+	}
 
 	std::unique_ptr<PlayerBarrier> player_one_barrier(new PlayerBarrier(400, 0, 50, world_bounds.size.y, &physics));
 	background->AttachChild(std::move(player_one_barrier));
@@ -93,16 +95,16 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, TextureHolder& text
 	root.AttachChild(std::move(dynamic));
 }
 
-void Level::CreateJagged(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue)
+void Level::CreateJagged(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds)
 {
-	sf::Texture* wallGrey = &texture_holder.Get(TextureID::kWallGrey);
-	sf::Texture* wallRed = &texture_holder.Get(TextureID::kWallRed);
-	sf::Texture* stoneWhite = &texture_holder.Get(TextureID::kStoneWhite);
-	sf::Texture* stoneBlack = &texture_holder.Get(TextureID::kStoneBlack);
-	sf::Texture* tileGrey = &texture_holder.Get(TextureID::kTileGrey);
-	sf::Texture* tileChess = &texture_holder.Get(TextureID::kTileChess);
-	sf::Texture* tileGreen = &texture_holder.Get(TextureID::kTileGreen);
-	sf::Texture* fire = &texture_holder.Get(TextureID::kFire);
+	sf::Texture* wallGrey = texture_holder ? &texture_holder->Get(TextureID::kWallGrey) : nullptr;
+	sf::Texture* wallRed = texture_holder ? &texture_holder->Get(TextureID::kWallRed) : nullptr;
+	sf::Texture* stoneWhite = texture_holder ? &texture_holder->Get(TextureID::kStoneWhite) : nullptr;
+	sf::Texture* stoneBlack = texture_holder ? &texture_holder->Get(TextureID::kStoneBlack) : nullptr;
+	sf::Texture* tileGrey = texture_holder ? &texture_holder->Get(TextureID::kTileGrey) : nullptr;
+	sf::Texture* tileChess = texture_holder ? &texture_holder->Get(TextureID::kTileChess) : nullptr;
+	sf::Texture* tileGreen = texture_holder ? &texture_holder->Get(TextureID::kTileGreen) : nullptr;
+	sf::Texture* fire = texture_holder ? &texture_holder->Get(TextureID::kFire) : nullptr;
 
 	std::unique_ptr<SceneNode> background(new SceneNode());
 	std::unique_ptr<SceneNode> walls(new SceneNode());
@@ -112,35 +114,35 @@ void Level::CreateJagged(SceneNode& root, Physics& physics, TextureHolder& textu
 
 	sf::Vector2f center(world_bounds.getCenter());
 
-	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, fire));
+	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, rand, fire));
 	dynamic->AttachChild(std::move(ball));
 
+	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(team_one));
 
-	std::unique_ptr<Paddle> paddle_one(new Paddle(0, data.GetSelectedCharacter(0), 200, center.y, physics, command_queue, sounds, stoneWhite));
-	dynamic->AttachChild(std::move(paddle_one));
+	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(team_two));
 
-	std::unique_ptr<Paddle> paddle_two(new Paddle(1, data.GetSelectedCharacter(1), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
-	dynamic->AttachChild(std::move(paddle_two));
-
-
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, sounds, &texture_holder, 15));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, rand, sounds, texture_holder, 15));
 	dynamic->AttachChild(std::move(pickupSpawner));
 
+	if (texture_holder)
+	{
+		std::unique_ptr<ShapeNode> player_one_zone(new ShapeNode(400, world_bounds.size.y));
+		player_one_zone->setPosition({ 0,0 });
+		player_one_zone->SetTexture(*tileGrey);
+		background->AttachChild(std::move(player_one_zone));
 
-	std::unique_ptr<ShapeNode> player_one_zone(new ShapeNode(400, world_bounds.size.y));
-	player_one_zone->setPosition({ 0,0 });
-	player_one_zone->SetTexture(*tileGrey);
-	background->AttachChild(std::move(player_one_zone));
+		std::unique_ptr<ShapeNode> player_two_zone(new ShapeNode(400, world_bounds.size.y));
+		player_two_zone->setPosition({ world_bounds.size.x - 400, 0 });
+		player_two_zone->SetTexture(*tileGrey);
+		background->AttachChild(std::move(player_two_zone));
 
-	std::unique_ptr<ShapeNode> player_two_zone(new ShapeNode(400, world_bounds.size.y));
-	player_two_zone->setPosition({ world_bounds.size.x - 400, 0 });
-	player_two_zone->SetTexture(*tileGrey);
-	background->AttachChild(std::move(player_two_zone));
-
-	std::unique_ptr<ShapeNode> playing_field(new ShapeNode(800, world_bounds.size.y));
-	playing_field->setPosition({ 400, 0 });
-	playing_field->SetTexture(*tileGreen);
-	background->AttachChild(std::move(playing_field));
+		std::unique_ptr<ShapeNode> playing_field(new ShapeNode(800, world_bounds.size.y));
+		playing_field->setPosition({ 400, 0 });
+		playing_field->SetTexture(*tileGreen);
+		background->AttachChild(std::move(playing_field));
+	}
 
 	std::unique_ptr<PlayerBarrier> player_one_barrier(new PlayerBarrier(400, 0, 50, world_bounds.size.y, &physics));
 	background->AttachChild(std::move(player_one_barrier));
@@ -177,16 +179,16 @@ void Level::CreateJagged(SceneNode& root, Physics& physics, TextureHolder& textu
 	root.AttachChild(std::move(dynamic));
 }
 
-void Level::CreateDeadly(SceneNode& root, Physics& physics, TextureHolder& texture_holder, sf::FloatRect world_bounds, SoundPlayer& sounds, GameData& data, CommandQueue& command_queue)
+void Level::CreateDeadly(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds)
 {
-	sf::Texture* wallGrey = &texture_holder.Get(TextureID::kWallGrey);
-	sf::Texture* wallRed = &texture_holder.Get(TextureID::kWallRed);
-	sf::Texture* stoneWhite = &texture_holder.Get(TextureID::kStoneWhite);
-	sf::Texture* stoneBlack = &texture_holder.Get(TextureID::kStoneBlack);
-	sf::Texture* tileGrey = &texture_holder.Get(TextureID::kTileGrey);
-	sf::Texture* tileChess = &texture_holder.Get(TextureID::kTileChess);
-	sf::Texture* tileGreen = &texture_holder.Get(TextureID::kTileGreen);
-	sf::Texture* fire = &texture_holder.Get(TextureID::kFire);
+	sf::Texture* wallGrey = texture_holder ? &texture_holder->Get(TextureID::kWallGrey) : nullptr;
+	sf::Texture* wallRed = texture_holder ? &texture_holder->Get(TextureID::kWallRed) : nullptr;
+	sf::Texture* stoneWhite = texture_holder ? &texture_holder->Get(TextureID::kStoneWhite) : nullptr;
+	sf::Texture* stoneBlack = texture_holder ? &texture_holder->Get(TextureID::kStoneBlack) : nullptr;
+	sf::Texture* tileGrey = texture_holder ? &texture_holder->Get(TextureID::kTileGrey) : nullptr;
+	sf::Texture* tileChess = texture_holder ? &texture_holder->Get(TextureID::kTileChess) : nullptr;
+	sf::Texture* tileGreen = texture_holder ? &texture_holder->Get(TextureID::kTileGreen) : nullptr;
+	sf::Texture* fire = texture_holder ? &texture_holder->Get(TextureID::kFire) : nullptr;
 
 	std::unique_ptr<SceneNode> background(new SceneNode());
 	std::unique_ptr<SceneNode> walls(new SceneNode());
@@ -196,31 +198,35 @@ void Level::CreateDeadly(SceneNode& root, Physics& physics, TextureHolder& textu
 
 	CreateBounds(*walls, physics, world_bounds, 10, wallRed);
 	
-	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, fire));
+	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, rand, fire));
 	dynamic->AttachChild(std::move(ball));
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(600, 20, 340, 800, &physics, sounds, &texture_holder, 15));
+
+	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(team_one));
+
+	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	dynamic->AttachChild(std::move(team_two));
+
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(600, 20, 340, 800, &physics, rand, sounds, texture_holder, 15));
 	dynamic->AttachChild(std::move(pickupSpawner));
 
-	std::unique_ptr<Paddle> paddle_one(new Paddle(0, data.GetSelectedCharacter(0), 200, center.y, physics, command_queue, sounds, stoneWhite));
-	dynamic->AttachChild(std::move(paddle_one));
-	std::unique_ptr<Paddle> paddle_two(new Paddle(1, data.GetSelectedCharacter(1), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
-	dynamic->AttachChild(std::move(paddle_two));
+	if (texture_holder)
+	{
+		std::unique_ptr<ShapeNode> team_one_zone(new ShapeNode(600, world_bounds.size.y));
+		team_one_zone->setPosition({ 0,0 });
+		team_one_zone->SetTexture(*tileGrey);
+		background->AttachChild(std::move(team_one_zone));
 
+		std::unique_ptr<ShapeNode> team_two_zone(new ShapeNode(600, world_bounds.size.y));
+		team_two_zone->setPosition({ 1000, 0 });
+		team_two_zone->SetTexture(*tileGrey);
+		background->AttachChild(std::move(team_two_zone));
 
-	std::unique_ptr<ShapeNode> team_one_zone(new ShapeNode(600, world_bounds.size.y));
-	team_one_zone->setPosition({ 0,0 });
-	team_one_zone->SetTexture(*tileGrey);
-	background->AttachChild(std::move(team_one_zone));
-	std::unique_ptr<ShapeNode> team_two_zone(new ShapeNode(600, world_bounds.size.y));
-	team_two_zone->setPosition({ 1000, 0 });
-	team_two_zone->SetTexture(*tileGrey);
-	background->AttachChild(std::move(team_two_zone));
-
-	std::unique_ptr<ShapeNode> playing_field(new ShapeNode(400, world_bounds.size.y));
-	playing_field->setPosition({ 600, 0 });
-	playing_field->SetTexture(*tileGreen);
-	background->AttachChild(std::move(playing_field));
-
+		std::unique_ptr<ShapeNode> playing_field(new ShapeNode(400, world_bounds.size.y));
+		playing_field->setPosition({ 600, 0 });
+		playing_field->SetTexture(*tileGreen);
+		background->AttachChild(std::move(playing_field));
+	}
 
 	std::unique_ptr<PlayerBarrier> team_one_barrier(new PlayerBarrier(600, 0, 50, world_bounds.size.y, &physics));
 	background->AttachChild(std::move(team_one_barrier));

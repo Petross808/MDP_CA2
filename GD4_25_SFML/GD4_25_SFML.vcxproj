@@ -148,6 +148,7 @@
     <ClCompile Include="command_queue.cpp" />
     <ClCompile Include="component.cpp" />
     <ClCompile Include="container.cpp" />
+    <ClCompile Include="e_action.hpp" />
     <ClCompile Include="e_collision_layer.hpp" />
     <ClCompile Include="game_client.cpp" />
     <ClCompile Include="game_over_state.cpp" />
@@ -162,6 +163,9 @@
     <ClCompile Include="menu_state.cpp" />
     <ClCompile Include="music_player.cpp" />
     <ClCompile Include="e_network_mode.hpp" />
+    <ClCompile Include="network_controller.cpp" />
+    <ClCompile Include="network_game_state.cpp" />
+    <ClCompile Include="network_tracker.cpp" />
     <ClCompile Include="paddle.cpp" />
     <ClCompile Include="pause_state.cpp" />
     <ClCompile Include="pawn.cpp" />
@@ -173,6 +177,7 @@
     <ClCompile Include="player_barrier.cpp" />
     <ClCompile Include="player_controller.cpp" />
     <ClCompile Include="player_data.cpp" />
+    <ClCompile Include="player_spawn.cpp" />
     <ClCompile Include="polygon_collider.cpp" />
     <ClCompile Include="score.cpp" />
     <ClCompile Include="game_data.cpp" />
@@ -189,6 +194,7 @@
     <ClCompile Include="utility.cpp" />
     <ClCompile Include="wall.cpp" />
     <ClCompile Include="world.cpp" />
+    <ClCompile Include="world_simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="action.hpp" />
@@ -219,6 +225,9 @@
     <ClInclude Include="menu_state.hpp" />
     <ClInclude Include="music_player.hpp" />
     <ClInclude Include="e_music_id.hpp" />
+    <ClInclude Include="network_controller.hpp" />
+    <ClInclude Include="network_game_state.hpp" />
+    <ClInclude Include="network_tracker.h" />
     <ClInclude Include="paddle.hpp" />
     <ClInclude Include="pause_state.hpp" />
     <ClInclude Include="pawn.hpp" />
@@ -231,6 +240,7 @@
     <ClInclude Include="player_controller.hpp" />
     <ClInclude Include="e_receiver_categories.hpp" />
     <ClInclude Include="player_data.hpp" />
+    <ClInclude Include="player_spawn.hpp" />
     <ClInclude Include="polygon_collider.hpp" />
     <ClInclude Include="score.hpp" />
     <ClInclude Include="game_data.hpp" />
@@ -252,6 +262,7 @@
     <ClInclude Include="utility.hpp" />
     <ClInclude Include="wall.hpp" />
     <ClInclude Include="world.hpp" />
+    <ClInclude Include="world_simulation.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="resource_holder.cpp">

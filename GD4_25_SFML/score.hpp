@@ -11,6 +11,7 @@
 class Score : public SceneNode
 {
 public:
+	Score(GameData& game_data);
 	Score(float x, float y, FontHolder& fonts, GameData& game_data);
 	~Score();
 
