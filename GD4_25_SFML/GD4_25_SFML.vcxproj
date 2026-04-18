@@ -165,6 +165,7 @@
     <ClCompile Include="e_network_mode.hpp" />
     <ClCompile Include="network_controller.cpp" />
     <ClCompile Include="network_game_state.cpp" />
+    <ClCompile Include="network_tracker.cpp" />
     <ClCompile Include="paddle.cpp" />
     <ClCompile Include="pause_state.cpp" />
     <ClCompile Include="pawn.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="e_music_id.hpp" />
     <ClInclude Include="network_controller.hpp" />
     <ClInclude Include="network_game_state.hpp" />
+    <ClInclude Include="network_tracker.h" />
     <ClInclude Include="paddle.hpp" />
     <ClInclude Include="pause_state.hpp" />
     <ClInclude Include="pawn.hpp" />

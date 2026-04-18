@@ -175,23 +175,6 @@ sf::Packet ServerProtocol::PhysicsSync::asPacket() const
 }
 
 
-// --- Player Use Pickup Packet ---
-ServerProtocol::PlayerUsePickup::PlayerUsePickup(uint8_t player_id) : player_id(player_id) {}
-ServerProtocol::PlayerUsePickup::PlayerUsePickup(sf::Packet& packet)
-{
-	packet >> this->player_id;
-}
-
-sf::Packet ServerProtocol::PlayerUsePickup::asPacket() const
-{
-	sf::Packet packet;
-	packet << static_cast<uint8_t>(PacketType::kPlayerUsePickup);
-	packet << player_id;
-
-	return packet;
-}
-
-
 // --- Action Player Packet ---
 ServerProtocol::ActionPlayer::ActionPlayer(uint8_t playerId, ActionID actionId, bool isPressed, bool isRealTime) :
 	playerId(playerId), actionId(actionId), isPressed(isPressed), isRealTime(isRealTime) {

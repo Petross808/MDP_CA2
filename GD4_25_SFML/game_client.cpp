@@ -297,21 +297,6 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 			}
 			break;
 		}
-		case ServerProtocol::PacketType::kPlayerUsePickup:
-		{
-			ServerProtocol::PlayerUsePickup playerPickup(packet);
-			Command pickup(DerivedAction<Pawn>(
-				[this, playerPickup](Pawn& p, sf::Time dt)
-				{
-					if (p.IsID(playerPickup.player_id)) p.UsePickup();
-				}
-			), ReceiverCategories::kPlayer);
-			if (m_game_state)
-			{
-				m_game_state->GetWorld().GetCommandQueue().Push(std::move(pickup));
-			}
-			break;
-		}
 		case ServerProtocol::PacketType::kPlayerAction:
 		{
 			ServerProtocol::ActionPlayer action(packet);

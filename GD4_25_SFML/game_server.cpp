@@ -142,6 +142,8 @@ void GameServer::Frame(sf::Time dt)
             ResetLobby();
         }
     }
+
+    m_network_tracker.Update(dt);
 }
 
 void GameServer::Tick()
@@ -176,6 +178,8 @@ void GameServer::HandleIncomingPackets()
             sf::Packet packet;
             while (peer->m_socket.receive(packet) == sf::Socket::Status::Done)
             {
+                m_network_tracker.LogReceivedPacket(packet);
+
                 //Interpret the packet and react to it
                 ResolvePacket(packet, *peer, detected_timeout);
 
@@ -202,7 +206,6 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
     uint8_t packet_type;
     packet >> packet_type;
     
-    std::cout << "Server: " << (int)packet_type << std::endl;
     switch (static_cast<ClientProtocol::PacketType>(packet_type))
     {
     case ClientProtocol::PacketType::kEmpty:
@@ -261,13 +264,6 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
     {
         ClientProtocol::ActionSelf action_self(packet);
         receiving_peer.m_player_controller.ApplyNetworkInput(action_self.actionId, action_self.isPressed, action_self.isRealTime);
-        /*
-        if (action_self.actionId == ActionID::kUsePickup)
-        {
-            sf::Packet response = ServerProtocol::PlayerUsePickup(receiving_peer.m_player_data.id).asPacket();
-            SendToAll(response);
-        }
-        */
 
         sf::Packet response = ServerProtocol::ActionPlayer(
             receiving_peer.m_player_data.id,
@@ -309,6 +305,7 @@ void GameServer::HandleIncomingConnections()
         }
 
         sf::Packet packet = ServerProtocol::WelcomePlayer(assigned_id, assigned_team, player_list).asPacket();
+        m_network_tracker.LogSentPacket(packet);
         auto _ = m_peers[m_connected_players]->m_socket.send(packet);
         m_peers[m_connected_players]->m_ready = true;
         m_peers[m_connected_players]->m_last_packet_time = Now();
@@ -358,6 +355,7 @@ void GameServer::SendToAll(sf::Packet& packet)
     {
         if (m_peers[i]->m_ready)
         {
+            m_network_tracker.LogSentPacket(packet);
             auto _ = m_peers[i]->m_socket.send(packet);
         }
     }

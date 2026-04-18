@@ -15,14 +15,14 @@
 class PickupSpawner : public SceneNode
 {
 public:
-	PickupSpawner(float x, float y, int width, int height, Physics* physics_ptr, std::default_random_engine& rand, SoundPlayer& sounds, TextureHolder& texture_holder, float spawn_time = 10);
+	PickupSpawner(float x, float y, int width, int height, Physics* physics_ptr, std::default_random_engine& rand, SoundPlayer* sounds, TextureHolder* texture_holder, float spawn_time = 10);
 	~PickupSpawner();
 protected:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
 private:
 	Physics* m_physics_ptr;
-	SoundPlayer& m_sounds;
-	TextureHolder& m_texture_holder;
+	SoundPlayer* m_sounds;
+	TextureHolder* m_texture_holder;
 	int m_width;
 	int m_height;
 	float m_spawn_time;

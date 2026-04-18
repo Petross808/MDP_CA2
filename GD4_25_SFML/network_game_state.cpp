@@ -97,7 +97,7 @@ bool NetworkGameState::HandleEvent(const sf::Event& event)
 		}
 	}
 
-	return true;
+	return false;
 }
 
 World& NetworkGameState::GetWorld()

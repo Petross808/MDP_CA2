@@ -18,7 +18,6 @@ namespace ServerProtocol
 		kGameStart,
 		kPlayerAction,
 		kPhysicsSync,
-		kPlayerUsePickup,
 		kCollisionSync
 	};
 
@@ -97,16 +96,6 @@ namespace ServerProtocol
 		sf::Packet asPacket() const;
 	public:
 		Physics::PhysicsState state;
-	};
-
-	struct PlayerUsePickup
-	{
-	public:
-		PlayerUsePickup(uint8_t player_id);
-		PlayerUsePickup(sf::Packet& packet);
-		sf::Packet asPacket() const;
-	public:
-		uint8_t player_id;
 	};
 
 	struct ActionPlayer

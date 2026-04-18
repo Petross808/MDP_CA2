@@ -22,3 +22,5 @@ constexpr auto kGameOverToMenuPause = 2;
 
 constexpr auto kLevelCount = 3;
 constexpr auto kCharacterCount = 4;
+
+constexpr auto kLogBandwidth = false;

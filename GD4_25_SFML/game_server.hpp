@@ -19,6 +19,7 @@
 #include "client_protocol.hpp"
 #include "world_simulation.hpp"
 #include "network_controller.hpp"
+#include "network_tracker.h"
 
 class GameServer
 {
@@ -90,6 +91,7 @@ private:
 	bool m_in_game;
 	std::unique_ptr<WorldSimulation> m_world_sim;
 	GameData m_game_data;
+	NetworkTracker m_network_tracker;
 
 };
 
