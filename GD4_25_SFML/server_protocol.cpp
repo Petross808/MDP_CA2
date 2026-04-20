@@ -236,3 +236,15 @@ sf::Packet ServerProtocol::CollisionSync::asPacket() const
 
 	return packet;
 }
+
+
+// --- Spawn Pickup Packet ---
+ServerProtocol::SpawnPickup::SpawnPickup() {}
+ServerProtocol::SpawnPickup::SpawnPickup(sf::Packet& packet) {}
+
+sf::Packet ServerProtocol::SpawnPickup::asPacket() const
+{
+	sf::Packet packet;
+	packet << static_cast<uint8_t>(PacketType::kSpawnPickup);
+	return packet;
+}

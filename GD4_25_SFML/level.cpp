@@ -57,7 +57,7 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world
 	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
 	dynamic->AttachChild(std::move(team_two));
 	
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, rand, sounds, texture_holder, 15));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, !data.IsOnline(), &physics, rand, sounds, texture_holder));
 	dynamic->AttachChild(std::move(pickupSpawner));
 	
 	if (texture_holder)
@@ -123,7 +123,7 @@ void Level::CreateJagged(SceneNode& root, Physics& physics, sf::FloatRect world_
 	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
 	dynamic->AttachChild(std::move(team_two));
 
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, &physics, rand, sounds, texture_holder, 15));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, !data.IsOnline(), &physics, rand, sounds, texture_holder));
 	dynamic->AttachChild(std::move(pickupSpawner));
 
 	if (texture_holder)
@@ -207,7 +207,7 @@ void Level::CreateDeadly(SceneNode& root, Physics& physics, sf::FloatRect world_
 	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
 	dynamic->AttachChild(std::move(team_two));
 
-	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(600, 20, 340, 800, &physics, rand, sounds, texture_holder, 15));
+	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(600, 20, 340, 800, !data.IsOnline(), &physics, rand, sounds, texture_holder));
 	dynamic->AttachChild(std::move(pickupSpawner));
 
 	if (texture_holder)

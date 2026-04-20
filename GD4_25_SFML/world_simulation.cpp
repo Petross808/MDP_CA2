@@ -9,6 +9,7 @@
 #include "level.hpp"
 #include "score.hpp"
 #include "player_spawn.hpp"
+#include "pickup_spawner.hpp"
 
 WorldSimulation::WorldSimulation(GameData& game_data)
 	: m_scene_graph(ReceiverCategories::kScene)
@@ -17,6 +18,7 @@ WorldSimulation::WorldSimulation(GameData& game_data)
 	, m_collision_data()
 	, m_game_data(game_data)
 	, m_random((unsigned int)game_data.GetSeed())
+	, m_pickup_clock()
 {
 	BuildScene();
 }
@@ -78,6 +80,18 @@ void WorldSimulation::SpawnPlayerPawn(int teamId, int playerId, int characterId,
 		}
 	), ReceiverCategories::kPlayerSpawn);
 	m_command_queue.Push(spawn);
+}
+
+bool WorldSimulation::TrySpawnPickup()
+{
+	if (m_pickup_clock.getElapsedTime() > sf::seconds(8.f))
+	{
+		m_pickup_clock.restart();
+		auto command = Command(DerivedAction<PickupSpawner>([this](PickupSpawner& p, sf::Time dt) { p.SpawnPickup(); }), ReceiverCategories::kPickupSpawner);
+		m_command_queue.Push(command);
+		return true;
+	}
+	return false;
 }
 
 void WorldSimulation::BuildScene()

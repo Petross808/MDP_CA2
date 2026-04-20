@@ -18,7 +18,8 @@ namespace ServerProtocol
 		kGameStart,
 		kPlayerAction,
 		kPhysicsSync,
-		kCollisionSync
+		kCollisionSync,
+		kSpawnPickup
 	};
 
 	struct Empty
@@ -119,5 +120,13 @@ namespace ServerProtocol
 		sf::Packet asPacket() const;
 	public:
 		std::vector<std::pair<int, int>> collisions;
+	};
+
+	struct SpawnPickup
+	{
+	public:
+		SpawnPickup();
+		SpawnPickup(sf::Packet& packet);
+		sf::Packet asPacket() const;
 	};
 }

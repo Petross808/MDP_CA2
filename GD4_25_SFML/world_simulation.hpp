@@ -24,6 +24,7 @@ public:
 	bool CheckScore();
 
 	void SpawnPlayerPawn(int teamId, int playerId, int characterId, int numberOfPlayers);
+	bool TrySpawnPickup();
 
 private:
 	void BuildScene();
@@ -38,5 +39,6 @@ private:
 
 	GameData& m_game_data;
 	std::default_random_engine m_random;
+	sf::Clock m_pickup_clock;
 };
 

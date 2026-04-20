@@ -13,6 +13,7 @@
 #include "utility.hpp"
 #include "network_game_state.hpp"
 #include "pawn.hpp"
+#include "pickup_spawner.hpp"
 
 #include <iostream>
 
@@ -206,7 +207,7 @@ void GameClient::FindServer()
 	
 	sf::Clock searchTimer;
 	sf::Socket::Status status = sf::Socket::Status::Disconnected;
-	while (searchTimer.getElapsedTime() < sf::seconds(1.) && status != sf::Socket::Status::Done)
+	while (searchTimer.getElapsedTime() < sf::seconds(3.) && status != sf::Socket::Status::Done)
 	{
 		status = udpSocket.receive(response, senderAddress, senderPort);
 		if (status == sf::Socket::Status::Done)
@@ -349,6 +350,14 @@ void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)
 				}
 			}
 			
+			break;
+		}
+		case ServerProtocol::PacketType::kSpawnPickup:
+		{
+			ServerProtocol::SpawnPickup spawnPickup(packet);
+			auto& command_queue = m_game_state->GetWorld().GetCommandQueue();
+			auto command = Command(DerivedAction<PickupSpawner>([this](PickupSpawner& p, sf::Time dt) { p.SpawnPickup(); }), ReceiverCategories::kPickupSpawner);
+			command_queue.Push(command);
 			break;
 		}
 		default:
