@@ -4,6 +4,7 @@
 */
 
 #include <SFML/Network/Packet.hpp>
+#include <SFML/Network/UdpSocket.hpp>
 
 #include "game_client.hpp"
 #include "game_server.hpp"
@@ -188,6 +189,32 @@ void GameClient::DoActionOnRemote(ActionID actionId, bool isPressed, bool isReal
 {
 	sf::Packet packet = ClientProtocol::ActionSelf(actionId, isPressed, isRealTime).asPacket();
 	SendPacket(packet);
+}
+
+void GameClient::FindServer()
+{
+	sf::UdpSocket udpSocket;
+	udpSocket.setBlocking(false);
+	auto _ = udpSocket.bind(50002);
+	std::string name = "Player";
+	sf::Packet packet = ServerProtocol::Empty().asPacket();
+	auto __ = udpSocket.send(packet, sf::IpAddress::Broadcast, 50001);
+
+	sf::Packet response;
+	std::optional<sf::IpAddress> senderAddress;
+	unsigned short senderPort;
+	
+	sf::Clock searchTimer;
+	sf::Socket::Status status = sf::Socket::Status::Disconnected;
+	while (searchTimer.getElapsedTime() < sf::seconds(1.) && status != sf::Socket::Status::Done)
+	{
+		status = udpSocket.receive(response, senderAddress, senderPort);
+		if (status == sf::Socket::Status::Done)
+		{
+			ConnectToServer(*senderAddress);
+		}
+	}
+	
 }
 
 void GameClient::HandlePacket(uint8_t packet_type, sf::Packet& packet)

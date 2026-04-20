@@ -9,6 +9,7 @@
 #include <SFML/Network/TcpListener.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Network/UdpSocket.hpp>
 
 #include <thread>
 #include <cstdint>
@@ -61,6 +62,7 @@ private:
 	void HandleIncomingPackets();
 	void ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, bool& detected_timeout);
 
+	void HandleIncomingQueries();
 	void HandleIncomingConnections();
 	void HandleDisconnections();
 
@@ -92,6 +94,8 @@ private:
 	std::unique_ptr<WorldSimulation> m_world_sim;
 	GameData m_game_data;
 	NetworkTracker m_network_tracker;
+
+	sf::UdpSocket m_discover_socket;
 
 };
 

@@ -49,6 +49,7 @@ public:
 	void UpdatePlayerOnRemote();
 	void ChangeLevelOnRemote(uint8_t levelId);
 	void DoActionOnRemote(ActionID actionId, bool isPressed, bool isRealTime);
+	void FindServer();
 
 private:
 	void HandlePacket(uint8_t packet_type, sf::Packet& packet);
