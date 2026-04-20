@@ -89,7 +89,7 @@ void GameServer::ExecutionThread()
 
     sf::Time frame_rate = sf::seconds(kTimePerFrame);
     sf::Time frame_time = sf::Time::Zero;
-    sf::Time tick_rate = sf::seconds(1.f / 20.f);
+    sf::Time tick_rate = sf::seconds(1.f / 10.f);
     sf::Time tick_time = sf::Time::Zero;
     sf::Clock frame_clock, tick_clock;
 
@@ -280,7 +280,10 @@ void GameServer::ResolvePacket(sf::Packet& packet, RemotePeer& receiving_peer, b
             action_self.isPressed,
             action_self.isRealTime).asPacket();
 
-        SendToAll(response);
+        if (action_self.actionId == ActionID::kUsePickup && action_self.isPressed)
+        {
+            SendToAll(response);
+        }
         break;
     }
     default:
