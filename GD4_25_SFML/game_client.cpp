@@ -1,6 +1,8 @@
 /*
 * Written by:
 * Petr Sulc - GD4b - D00261476
+* Edited by:
+* Jakub Polacek - GD4b - D00260171
 */
 
 #include <SFML/Network/Packet.hpp>
@@ -15,6 +17,7 @@
 #include "pawn.hpp"
 
 #include <iostream>
+#include <fstream>
 
 GameClient::GameClient() :
 	m_status(ConnectionStatus::kNone), m_client_running(false),
@@ -38,10 +41,33 @@ void GameClient::Start(LobbyState* lobby)
 	m_lobby = lobby;
 	m_client_running = true;
 	m_local_player.lobby_ready = false;
+
+	std::ifstream file("player_data.txt");
+
+	if (file.is_open())
+	{
+		std::string data;
+		getline(file, data);
+		m_local_player.name = data;
+		getline(file, data);
+		int character = stoi(data);
+		m_local_player.character = character;
+		file.close();
+		//find button
+	}
 }
 
 void GameClient::End()
 {
+	//Save new player data
+	std::ofstream file("player_data.txt", std::ofstream::trunc);
+	file << m_local_player.name << std::endl;
+	std::cout << "testing: " << static_cast<int>(m_local_player.character) << std::endl;
+	file << static_cast<int>(m_local_player.character) << std::endl;
+	file.close();
+
+
+	//Cleanup
 	m_lobby = nullptr;
 	m_client_running = false;
 	DisconnectFromServer();

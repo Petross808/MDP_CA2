@@ -126,6 +126,8 @@ LobbyState::LobbyState(StateStack& stack) :
 	player_one->setPosition(sf::Vector2f(kWindowWidth / 2.f, 500));
 	player_one->SetText("Character");
 	player_one->CentreButton();
+	data->SetSelectedCharacter(0, GetContext().client->GetLocalPlayer().character);
+	playerLabel->SetText(data->GetCharacterName(0), true);
 	player_one->SetCallback([this, playerLabel, data]()
 		{
 			data->CycleCharacter(0);
