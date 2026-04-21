@@ -75,7 +75,7 @@ void WorldSimulation::SpawnPlayerPawn(int teamId, int playerId, int characterId,
 		{
 			if (p.GetTeamId() == teamId)
 			{
-				p.SpawnPlayer(playerId, characterId, numberOfPlayers);
+				p.SpawnPlayer(playerId, characterId, numberOfPlayers, "");
 			}
 		}
 	), ReceiverCategories::kPlayerSpawn);

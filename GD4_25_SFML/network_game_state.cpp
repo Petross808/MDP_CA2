@@ -39,7 +39,7 @@ NetworkGameState::NetworkGameState(StateStack& stack) :
 
 	for (auto& player : GetContext().client->GetPlayerList())
 	{
-		m_world.SpawnPlayerPawn(player.team, player.id, player.character);
+		m_world.SpawnPlayerPawn(player.team, player.id, player.character, player.name);
 	}
 }
 
