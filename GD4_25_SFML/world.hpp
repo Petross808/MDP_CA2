@@ -26,7 +26,7 @@ public:
 	CommandQueue& GetCommandQueue();
 	void SetSeed(uint64_t seed);
 	Physics& GetPhysics();
-	void SpawnPlayerPawn(int teamId, int playerId, int characterId);
+	void SpawnPlayerPawn(int teamId, int playerId, int characterId, std::string name = "");
 
 private:
 	void LoadTextures();

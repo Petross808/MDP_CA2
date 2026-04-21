@@ -143,7 +143,8 @@ ServerProtocol::PhysicsSync::PhysicsSync(sf::Packet& packet)
 	uint8_t size;
 	packet >> size;
 
-	float xPos, yPos, xVel, yVel;
+	int16_t xPos, yPos;
+	int8_t	xVel, yVel;
 	for (int i = 0; i < size; ++i)
 	{
 		packet >> xPos;
@@ -152,7 +153,7 @@ ServerProtocol::PhysicsSync::PhysicsSync(sf::Packet& packet)
 		packet >> yVel;
 
 		state.positions.emplace_back(sf::Vector2f(xPos, yPos));
-		state.velocities.emplace_back(sf::Vector2f(xVel, yVel));
+		state.velocities.emplace_back(sf::Vector2f(xVel*256, yVel*256));
 	}
 }
 
@@ -165,10 +166,10 @@ sf::Packet ServerProtocol::PhysicsSync::asPacket() const
 	
 	for (int i = 0; i < size; ++i)
 	{
-		packet << state.positions[i].x;
-		packet << state.positions[i].y;
-		packet << state.velocities[i].x;
-		packet << state.velocities[i].y;
+		packet << static_cast<int16_t>((int)state.positions[i].x);
+		packet << static_cast<int16_t>((int)state.positions[i].y);
+		packet << static_cast<int8_t>((int)(state.velocities[i].x/256));
+		packet << static_cast<int8_t>((int)(state.velocities[i].y/256));
 	}
 
 	return packet;

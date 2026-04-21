@@ -27,7 +27,7 @@ void Level::CreateBounds(SceneNode& root, Physics& physics, sf::FloatRect world_
 }
 
 
-void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds)
+void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds, FontHolder* fonts)
 {
 	sf::Texture* wallGrey = texture_holder ? &texture_holder->Get(TextureID::kWallGrey) : nullptr;
 	sf::Texture* wallRed = texture_holder ? &texture_holder->Get(TextureID::kWallRed) : nullptr;
@@ -51,10 +51,10 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world
 	dynamic->AttachChild(std::move(ball));
 
 	
-	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite, fonts));
 	dynamic->AttachChild(std::move(team_one));
 
-	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite, fonts));
 	dynamic->AttachChild(std::move(team_two));
 	
 	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, !data.IsOnline(), &physics, rand, sounds, texture_holder));
@@ -95,7 +95,7 @@ void Level::CreateClassic(SceneNode& root, Physics& physics, sf::FloatRect world
 	root.AttachChild(std::move(dynamic));
 }
 
-void Level::CreateJagged(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds)
+void Level::CreateJagged(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds, FontHolder* fonts)
 {
 	sf::Texture* wallGrey = texture_holder ? &texture_holder->Get(TextureID::kWallGrey) : nullptr;
 	sf::Texture* wallRed = texture_holder ? &texture_holder->Get(TextureID::kWallRed) : nullptr;
@@ -117,10 +117,10 @@ void Level::CreateJagged(SceneNode& root, Physics& physics, sf::FloatRect world_
 	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, rand, fire));
 	dynamic->AttachChild(std::move(ball));
 
-	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite, fonts));
 	dynamic->AttachChild(std::move(team_one));
 
-	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite, fonts));
 	dynamic->AttachChild(std::move(team_two));
 
 	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(450, 20, 640, 800, !data.IsOnline(), &physics, rand, sounds, texture_holder));
@@ -179,7 +179,7 @@ void Level::CreateJagged(SceneNode& root, Physics& physics, sf::FloatRect world_
 	root.AttachChild(std::move(dynamic));
 }
 
-void Level::CreateDeadly(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds)
+void Level::CreateDeadly(SceneNode& root, Physics& physics, sf::FloatRect world_bounds, std::default_random_engine& rand, GameData& data, CommandQueue& command_queue, TextureHolder* texture_holder, SoundPlayer* sounds, FontHolder* fonts)
 {
 	sf::Texture* wallGrey = texture_holder ? &texture_holder->Get(TextureID::kWallGrey) : nullptr;
 	sf::Texture* wallRed = texture_holder ? &texture_holder->Get(TextureID::kWallRed) : nullptr;
@@ -201,10 +201,10 @@ void Level::CreateDeadly(SceneNode& root, Physics& physics, sf::FloatRect world_
 	std::unique_ptr<Ball> ball(new Ball(center.x - 20, center.y - 20, 20, &physics, rand, fire));
 	dynamic->AttachChild(std::move(ball));
 
-	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite));
+	std::unique_ptr<PlayerSpawn> team_one(new PlayerSpawn(0, data.IsOnline(), 200, center.y, physics, command_queue, sounds, stoneWhite, fonts));
 	dynamic->AttachChild(std::move(team_one));
 
-	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite));
+	std::unique_ptr<PlayerSpawn> team_two(new PlayerSpawn(1, data.IsOnline(), world_bounds.size.x - 200, center.y, physics, command_queue, sounds, stoneWhite, fonts));
 	dynamic->AttachChild(std::move(team_two));
 
 	std::unique_ptr<PickupSpawner> pickupSpawner(new PickupSpawner(600, 20, 340, 800, !data.IsOnline(), &physics, rand, sounds, texture_holder));

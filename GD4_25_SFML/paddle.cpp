@@ -36,10 +36,10 @@ Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics
 	{
 	case 0:
 		polygon = {
-			{ 0.f, 0.f },
-			{ 0.f, -3.f },
-			{ 1.f, -3.f },
-			{ 1.f, 0.f }
+			{ -0.5f, 1.5f },
+			{ -0.5f, -1.5f },
+			{ 0.5f, -1.5f },
+			{ 0.5f, 1.5f }
 		};
 		break;
 	case 1:
@@ -63,10 +63,10 @@ Paddle::Paddle(int playerId, int characterId, float x, float y, Physics& physics
 		break;
 	case 3:
 		polygon = {
-			{ 0.f, 0.f },
-			{ 0.f, -2.f },
-			{ 0.5f, -2.f },
-			{ 0.5f, 0.f }
+			{ -0.25f, 1.f },
+			{ -0.25f, -1.f },
+			{ 0.25f, -1.f },
+			{ 0.25f, 1.f }
 		};
 		m_physics_body.SetValues(10.f, 800.f, 100.f, 0.1f, 1.f);
 		m_speed = 10000.f;

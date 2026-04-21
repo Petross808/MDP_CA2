@@ -45,6 +45,8 @@ void PhysicsBody::AddForce(float x, float y)
 void PhysicsBody::ApplyImpulse(float strength, sf::Vector2f normal)
 {
 	m_velocity += (strength / m_mass) * normal;
+	m_velocity.x = (int)m_velocity.x;
+	m_velocity.y = (int)m_velocity.y;
 }
 
 void PhysicsBody::Move(sf::Vector2f delta)
@@ -66,6 +68,8 @@ void PhysicsBody::Simulate(sf::Time dt)
 		m_velocity = m_velocity.normalized() * velocityBeforeAcc.length();
 	}
 	
+	m_velocity.x = (int)m_velocity.x;
+	m_velocity.y = (int)m_velocity.y;
 	Move(m_velocity * dts);
 
 	m_acceleration = { 0,0 };

@@ -113,13 +113,13 @@ void World::BuildScene()
 	switch (m_game_data.GetSelectedLevel())
 	{
 	case 0:
-		Level::CreateClassic(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds);
+		Level::CreateClassic(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds, &m_fonts);
 		break;
 	case 1:
-		Level::CreateJagged(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds);
+		Level::CreateJagged(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds, &m_fonts);
 		break;
 	case 2:
-		Level::CreateDeadly(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds);
+		Level::CreateDeadly(m_scene_graph, m_physics, m_world_bounds, m_random, m_game_data, m_command_queue, &m_textures, &m_sounds, &m_fonts);
 		break;
 	default:
 		break;
@@ -169,20 +169,20 @@ Physics& World::GetPhysics()
 	return m_physics;
 }
 
-void World::SpawnPlayerPawn(int teamId, int playerId, int characterId)
+void World::SpawnPlayerPawn(int teamId, int playerId, int characterId, std::string name)
 {
 	Command spawn(DerivedAction<PlayerSpawn>(
-		[this, teamId, playerId, characterId](PlayerSpawn& p, sf::Time dt)
+		[this, teamId, playerId, characterId, name](PlayerSpawn& p, sf::Time dt)
 		{
 			if (p.GetTeamId() == teamId)
 			{
 				if (teamId == 0)
 				{
-					p.SpawnPlayer(playerId, characterId, m_game_data.GetTeamOnePlayers());
+					p.SpawnPlayer(playerId, characterId, m_game_data.GetTeamOnePlayers(), name);
 				}
 				else
 				{
-					p.SpawnPlayer(playerId, characterId, m_game_data.GetTeamTwoPlayers());
+					p.SpawnPlayer(playerId, characterId, m_game_data.GetTeamTwoPlayers(), name);
 
 				}
 			}
