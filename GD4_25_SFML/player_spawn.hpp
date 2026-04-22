@@ -1,3 +1,8 @@
+/*
+* Written by:
+* Petr Sulc - GD4b - D00261476
+*/
+
 #pragma once
 #include "scene_node.hpp"
 #include "sound_player.hpp"

@@ -1,3 +1,8 @@
+/*
+* Written by:
+* Petr Sulc - GD4b - D00261476
+*/
+
 #include "network_controller.hpp"
 #include "pawn.hpp"
 #include "player_spawn.hpp"

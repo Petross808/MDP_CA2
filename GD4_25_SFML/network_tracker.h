@@ -1,3 +1,8 @@
+/*
+* Written by:
+* Petr Sulc - GD4b - D00261476
+*/
+
 #pragma once
 #include <SFML/Network/Packet.hpp>
 #include <SFML/System/Time.hpp>
